@@ -12,298 +12,1038 @@
       --muted: #64748b;
       --line: #e2e8f0;
       --dark: #020617;
-      --green: #059669;
+      --green: #16a34a;
+      --green-soft: #dcfce7;
       --red: #dc2626;
-      --amber: #f59e0b;
-      --softGreen: #ecfdf5;
-      --softRed: #fff1f2;
-      --softAmber: #fffbeb;
-      --shadow: 0 10px 30px rgba(15,23,42,.08);
+      --red-soft: #fee2e2;
+      --yellow: #f59e0b;
+      --yellow-soft: #fef3c7;
+      --blue-soft: #dbeafe;
     }
+
     * { box-sizing: border-box; }
-    body { margin: 0; font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; background: var(--bg); color: var(--ink); }
-    .wrap { max-width: 1180px; margin: 0 auto; padding: 18px; }
-    .hero { background: var(--dark); color: white; border-radius: 26px; padding: 24px; box-shadow: var(--shadow); display: grid; grid-template-columns: 1fr; gap: 18px; }
-    .hero h1 { margin: 8px 0; font-size: clamp(34px, 8vw, 60px); line-height: .95; letter-spacing: -0.05em; }
-    .hero p { margin: 0; color: #cbd5e1; max-width: 780px; line-height: 1.6; }
-    .label { color: #6ee7b7; font-size: 12px; font-weight: 900; letter-spacing: .3em; text-transform: uppercase; }
-    .statusBox { border-radius: 22px; padding: 20px; text-align: center; font-weight: 900; box-shadow: var(--shadow); }
-    .statusBox small { display: block; letter-spacing: .25em; text-transform: uppercase; opacity: .9; font-size: 11px; }
-    .statusBox strong { display: block; font-size: 34px; margin-top: 7px; }
-    .statusBox span { display:block; margin-top: 8px; font-size: 13px; opacity: .95; }
-    .go { background: var(--green); color: white; }
-    .deny { background: var(--red); color: white; }
-    .wait { background: var(--amber); color: white; }
-    .grid { display: grid; gap: 16px; }
-    .mainGrid { display: grid; grid-template-columns: 1fr; gap: 16px; margin-top: 16px; }
-    .card { background: var(--card); border: 1px solid var(--line); border-radius: 22px; padding: 18px; box-shadow: var(--shadow); }
-    .card h2, .card h3 { margin: 0; letter-spacing: -0.02em; }
-    .card p { color: var(--muted); line-height: 1.5; }
-    .ticketGrid { display: grid; gap: 12px; grid-template-columns: 1fr; }
-    label { display: block; }
-    .fieldLabel { display: block; margin-bottom: 6px; color: var(--muted); font-size: 11px; text-transform: uppercase; font-weight: 900; letter-spacing: .08em; }
-    input, select, textarea { width: 100%; border: 1px solid var(--line); border-radius: 14px; padding: 11px 12px; font: inherit; outline: none; background: white; }
-    input:focus, select:focus, textarea:focus { border-color: #475569; }
-    textarea { min-height: 96px; resize: vertical; }
-    .stats { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-top: 14px; }
-    .stat { background: #f8fafc; border-radius: 16px; padding: 12px; }
-    .stat small { display: block; color: var(--muted); text-transform: uppercase; font-size: 11px; font-weight: 900; }
-    .stat b { display: block; font-size: 24px; margin-top: 5px; }
-    .sectionTitle { display: flex; justify-content: space-between; gap: 12px; align-items: start; }
-    .pill { display: inline-flex; align-items: center; border-radius: 999px; padding: 5px 10px; font-size: 12px; font-weight: 900; background: #f1f5f9; color: #334155; white-space: nowrap; }
-    .pill.ok { background: var(--softGreen); color: #047857; }
-    .pill.bad { background: var(--softRed); color: #be123c; }
-    .checks { display: grid; gap: 8px; margin-top: 14px; }
-    .checkBtn { border: 1px solid var(--line); background: #f8fafc; border-radius: 14px; padding: 12px; display: flex; align-items: flex-start; gap: 10px; cursor: pointer; text-align: left; transition: .15s ease; }
-    .checkBtn:hover { transform: translateY(-1px); }
-    .box { width: 21px; height: 21px; border: 2px solid #cbd5e1; border-radius: 6px; flex: 0 0 21px; display:flex; align-items:center; justify-content:center; font-weight:900; color: transparent; margin-top: 1px; }
-    .checkBtn.active { background: var(--softGreen); border-color: #86efac; }
-    .checkBtn.active .box { background: var(--green); border-color: var(--green); color: white; }
-    .blocker.active { background: var(--softRed); border-color: #fda4af; }
-    .blocker.active .box { background: var(--red); border-color: var(--red); color: white; }
-    .checkText { font-size: 14px; line-height: 1.45; }
-    .reasons { margin: 14px 0 0; padding: 0; list-style: none; display: grid; gap: 8px; }
-    .reasons li { background: #f8fafc; border: 1px solid var(--line); padding: 10px 12px; border-radius: 14px; font-size: 14px; line-height: 1.4; }
-    .reasons li::before { content: "×"; color: var(--red); font-weight: 900; margin-right: 8px; }
-    .actions { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 14px; }
-    button.action { border: 0; border-radius: 14px; padding: 12px 14px; font-weight: 900; cursor: pointer; }
-    .primary { background: var(--dark); color: white; }
-    .secondary { background: #e2e8f0; color: #0f172a; }
-    .danger { background: var(--softRed); color: #be123c; }
-    .tabs { display: flex; flex-wrap: wrap; gap: 8px; background: white; border-radius: 20px; padding: 8px; box-shadow: var(--shadow); margin-top: 16px; border:1px solid var(--line); }
-    .tab { border: 0; background: #f1f5f9; padding: 10px 14px; border-radius: 13px; font-weight: 900; color: #475569; cursor: pointer; }
-    .tab.active { background: var(--dark); color: white; }
-    .tabPage { display: none; }
-    .tabPage.active { display: block; }
-    ol.flow { margin: 14px 0 0; padding-left: 18px; color: #334155; display: grid; gap: 8px; font-size: 14px; }
-    .journalItem { background: #f8fafc; border: 1px solid var(--line); padding: 14px; border-radius: 16px; margin-top: 10px; }
-    .journalItem b { display:block; }
-    .studyGrid { display:grid; gap:12px; grid-template-columns:1fr; }
-    details { background:#f8fafc; border:1px solid var(--line); border-radius:16px; padding:14px; }
-    summary { cursor:pointer; font-weight:900; }
-    footer { margin-top: 16px; background: var(--dark); color: #94a3b8; text-align:center; padding: 16px; border-radius: 18px; font-size: 12px; font-weight: 700; }
-    @media (min-width: 760px) { .hero { grid-template-columns: 1fr 320px; align-items:center; } .ticketGrid { grid-template-columns: repeat(3, 1fr); } .studyGrid { grid-template-columns: repeat(2, 1fr); } }
-    @media (min-width: 1020px) { .mainGrid { grid-template-columns: 1fr 390px; align-items:start; } .side { position: sticky; top: 16px; } .sectionGrid { grid-template-columns: repeat(2, 1fr); } }
+    body {
+      margin: 0;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: var(--bg);
+      color: var(--ink);
+    }
+
+    .wrap {
+      width: min(1180px, calc(100% - 28px));
+      margin: 0 auto;
+      padding: 18px 0 40px;
+    }
+
+    .hero {
+      background: var(--dark);
+      color: white;
+      border-radius: 28px;
+      padding: 24px;
+      box-shadow: 0 18px 35px rgba(15, 23, 42, .18);
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 16px;
+    }
+
+    @media (min-width: 850px) {
+      .hero { grid-template-columns: 1fr 320px; align-items: center; }
+    }
+
+    .eyebrow {
+      color: #6ee7b7;
+      font-weight: 900;
+      letter-spacing: .24em;
+      text-transform: uppercase;
+      font-size: 12px;
+      margin: 0 0 8px;
+    }
+
+    h1 {
+      font-size: clamp(34px, 6vw, 58px);
+      line-height: .95;
+      margin: 0;
+      letter-spacing: -0.05em;
+    }
+
+    .hero p { color: #cbd5e1; line-height: 1.55; margin: 12px 0 0; }
+
+    .mini-stats {
+      background: rgba(255,255,255,.08);
+      border: 1px solid rgba(255,255,255,.12);
+      border-radius: 20px;
+      padding: 16px;
+    }
+
+    .stat-row {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      font-size: 14px;
+      padding: 7px 0;
+    }
+
+    .progress {
+      height: 12px;
+      border-radius: 99px;
+      background: rgba(255,255,255,.12);
+      overflow: hidden;
+      margin: 10px 0;
+    }
+
+    .progress > span {
+      display: block;
+      height: 100%;
+      background: #34d399;
+      width: 0%;
+      transition: width .2s ease;
+    }
+
+    .tabs {
+      margin: 16px 0;
+      background: white;
+      border-radius: 18px;
+      padding: 8px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      box-shadow: 0 8px 20px rgba(15,23,42,.06);
+    }
+
+    .tab {
+      border: 0;
+      background: #f1f5f9;
+      color: #475569;
+      border-radius: 13px;
+      padding: 10px 14px;
+      font-weight: 900;
+      cursor: pointer;
+    }
+
+    .tab.active {
+      background: var(--dark);
+      color: white;
+    }
+
+    .grid {
+      display: grid;
+      gap: 16px;
+    }
+
+    .grid-2 { grid-template-columns: 1fr; }
+    .grid-3 { grid-template-columns: 1fr; }
+
+    @media (min-width: 760px) {
+      .grid-2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .grid-3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+    }
+
+    @media (min-width: 1040px) {
+      .layout { grid-template-columns: 1fr 390px; align-items: start; }
+      .sticky { position: sticky; top: 14px; }
+    }
+
+    .card {
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: 24px;
+      padding: 18px;
+      box-shadow: 0 8px 22px rgba(15,23,42,.05);
+    }
+
+    .card h2, .card h3 {
+      margin: 0;
+      letter-spacing: -0.025em;
+    }
+
+    .card h2 { font-size: 26px; }
+    .card h3 { font-size: 19px; }
+    .card .sub {
+      color: var(--muted);
+      line-height: 1.5;
+      margin: 6px 0 0;
+      font-size: 14px;
+    }
+
+    label span {
+      display: block;
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: .08em;
+      font-weight: 900;
+      color: var(--muted);
+      margin: 0 0 6px;
+    }
+
+    input, select, textarea {
+      width: 100%;
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      padding: 11px 12px;
+      font: inherit;
+      outline: none;
+      background: white;
+    }
+
+    textarea { min-height: 92px; resize: vertical; }
+
+    input:focus, select:focus, textarea:focus { border-color: #94a3b8; }
+
+    .fields { display: grid; gap: 12px; margin-top: 16px; }
+    @media (min-width: 760px) { .fields { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+    .span-all { grid-column: 1 / -1; }
+
+    .check-list {
+      margin-top: 14px;
+      display: grid;
+      gap: 9px;
+    }
+
+    .check {
+      width: 100%;
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      text-align: left;
+      border: 1px solid var(--line);
+      background: #f8fafc;
+      border-radius: 14px;
+      padding: 11px;
+      cursor: pointer;
+      transition: .15s ease;
+      font: inherit;
+      color: #334155;
+    }
+
+    .check:hover { background: #f1f5f9; }
+    .check.on {
+      border-color: #86efac;
+      background: var(--green-soft);
+      color: #064e3b;
+      font-weight: 750;
+    }
+    .check.blocker.on {
+      border-color: #fca5a5;
+      background: var(--red-soft);
+      color: #7f1d1d;
+    }
+
+    .box {
+      width: 22px;
+      height: 22px;
+      border: 1px solid #cbd5e1;
+      background: white;
+      border-radius: 7px;
+      display: inline-grid;
+      place-items: center;
+      flex: 0 0 auto;
+      font-size: 13px;
+      font-weight: 1000;
+      color: transparent;
+      margin-top: 1px;
+    }
+
+    .check.on .box {
+      color: white;
+      background: var(--green);
+      border-color: var(--green);
+    }
+    .check.blocker.on .box {
+      color: white;
+      background: var(--red);
+      border-color: var(--red);
+    }
+
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 999px;
+      padding: 6px 10px;
+      font-size: 12px;
+      font-weight: 900;
+      background: #f1f5f9;
+      color: #334155;
+    }
+
+    .section-head {
+      display: flex;
+      align-items: start;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 2px;
+    }
+
+    .decision {
+      border-radius: 22px;
+      padding: 20px;
+      text-align: center;
+      color: white;
+      box-shadow: 0 14px 28px rgba(15, 23, 42, .16);
+    }
+
+    .decision.go { background: var(--green); }
+    .decision.no { background: var(--red); }
+    .decision.wait { background: var(--yellow); }
+
+    .decision small {
+      display: block;
+      text-transform: uppercase;
+      letter-spacing: .22em;
+      font-weight: 900;
+      opacity: .9;
+    }
+
+    .decision strong {
+      display: block;
+      font-size: 34px;
+      margin-top: 8px;
+      letter-spacing: -0.04em;
+    }
+
+    .decision p {
+      margin: 8px 0 0;
+      font-weight: 800;
+      font-size: 14px;
+      opacity: .95;
+    }
+
+    .math-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0,1fr));
+      gap: 10px;
+      margin-top: 14px;
+    }
+
+    .math {
+      background: #f8fafc;
+      border-radius: 16px;
+      padding: 12px;
+    }
+
+    .math span {
+      color: var(--muted);
+      text-transform: uppercase;
+      font-size: 11px;
+      font-weight: 900;
+      display: block;
+    }
+
+    .math b {
+      display: block;
+      margin-top: 4px;
+      font-size: 22px;
+      letter-spacing: -0.04em;
+    }
+
+    .reasons {
+      background: #f8fafc;
+      border-radius: 18px;
+      padding: 14px;
+      margin-top: 14px;
+    }
+
+    .reasons h3 {
+      font-size: 16px;
+      margin-bottom: 8px;
+    }
+
+    .reasons ul {
+      margin: 0;
+      padding-left: 20px;
+      color: #334155;
+      font-size: 14px;
+      line-height: 1.55;
+    }
+
+    .ok { color: var(--green); font-weight: 900; }
+    .bad { color: var(--red); font-weight: 900; }
+
+    .hidden { display: none; }
+
+    .actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 14px;
+    }
+
+    .btn {
+      border: 0;
+      border-radius: 14px;
+      padding: 12px 14px;
+      font-weight: 900;
+      cursor: pointer;
+      background: var(--dark);
+      color: white;
+    }
+    .btn.secondary { background: #e2e8f0; color: #0f172a; }
+    .btn.danger { background: var(--red-soft); color: #991b1b; }
+
+    .log {
+      border: 1px solid var(--line);
+      background: #f8fafc;
+      border-radius: 16px;
+      padding: 14px;
+      margin-top: 10px;
+    }
+
+    footer {
+      margin-top: 18px;
+      text-align: center;
+      color: #94a3b8;
+      font-size: 12px;
+      font-weight: 700;
+      padding: 16px;
+      background: var(--dark);
+      border-radius: 18px;
+    }
   </style>
 </head>
 <body>
-  <div class="wrap">
-    <header class="hero">
+  <main class="wrap">
+    <section class="hero">
       <div>
-        <div class="label">Strict Mode</div>
+        <p class="eyebrow">Strict Mode</p>
         <h1>Trading Bouncer</h1>
-        <p>This app guards the door before you enter a trade. If all rules pass, it says GO AHEAD. If one serious rule fails, the trade gets bounced.</p>
+        <p>This app does not predict profit. It checks your process. Full Bouncer before the session. Short Bouncer right before entry. If the bouncer says no, the trade does not exist.</p>
       </div>
-      <div id="heroStatus" class="statusBox wait">
-        <small>Current Decision</small>
-        <strong>NOT YET</strong>
-        <span>Fill the trade ticket and pass the checks.</span>
-      </div>
-    </header>
-
-    <div class="tabs">
-      <button class="tab active" data-tab="bouncer">Bouncer</button>
-      <button class="tab" data-tab="manage">Manage</button>
-      <button class="tab" data-tab="journal">Journal</button>
-      <button class="tab" data-tab="study">Study</button>
-    </div>
-
-    <section id="bouncer" class="tabPage active">
-      <div class="mainGrid">
-        <main class="grid">
-          <div class="card">
-            <h2>Trade Ticket</h2>
-            <p>The bouncer checks these fields plus every required checkbox.</p>
-            <div class="ticketGrid">
-              <label><span class="fieldLabel">Market</span><input id="market" placeholder="NAS100, Gold, SPY..." /></label>
-              <label><span class="fieldLabel">Session</span><input id="session" placeholder="NY open, London..." /></label>
-              <label><span class="fieldLabel">Account Size</span><input id="accountSize" type="number" value="500" /></label>
-              <label><span class="fieldLabel">Side</span><select id="side"><option>Wait</option><option>Buy</option><option>Sell</option></select></label>
-              <label><span class="fieldLabel">Trend</span><select id="trend"><option></option><option>Uptrend</option><option>Downtrend</option><option>Consolidation</option></select></label>
-              <label><span class="fieldLabel">Zone Used</span><input id="zone" placeholder="Buyer zone / seller zone" /></label>
-              <label><span class="fieldLabel">Entry Price</span><input id="entryPrice" type="number" /></label>
-              <label><span class="fieldLabel">Stop Loss</span><input id="stopLoss" type="number" /></label>
-              <label><span class="fieldLabel">Target</span><input id="target" type="number" /></label>
-              <label><span class="fieldLabel">Trades Taken Today</span><input id="tradesTaken" type="number" value="0" /></label>
-              <label><span class="fieldLabel">Daily Loss %</span><input id="dailyLossPct" type="number" value="0" /></label>
-            </div>
-            <label style="margin-top:12px"><span class="fieldLabel">Why this trade is valid</span><textarea id="reason" placeholder="Example: bullish indication broke swing high, correction pulled into buyer zone, continuation is starting on 15M..."></textarea></label>
-          </div>
-
-          <div class="card">
-            <div class="sectionTitle"><div><h2>No-Trade Blockers</h2><p>Checking any one of these denies the trade.</p></div><span id="blockerPill" class="pill ok">clear</span></div>
-            <div id="blockers" class="checks"></div>
-          </div>
-
-          <div id="requiredSections" class="grid sectionGrid"></div>
-        </main>
-        <aside class="side grid">
-          <div class="card">
-            <div id="sideStatus" class="statusBox wait">
-              <small>Trading Bouncer</small>
-              <strong>NOT YET</strong>
-              <span>Some rules are missing.</span>
-            </div>
-            <div class="stats">
-              <div class="stat"><small>1% Risk</small><b id="riskAmount">$5.00</b></div>
-              <div class="stat"><small>R:R</small><b id="rr">0.00R</b></div>
-              <div class="stat"><small>Risk Distance</small><b id="riskDistance">0.00</b></div>
-              <div class="stat"><small>Units</small><b id="units">0</b></div>
-            </div>
-            <h3 style="margin-top:16px">Denied Until Fixed</h3>
-            <ul id="reasons" class="reasons"></ul>
-          </div>
-          <div class="card">
-            <h3>Quick Flow</h3>
-            <ol id="flow" class="flow"></ol>
-          </div>
-          <div class="card">
-            <h3>Reset</h3>
-            <div class="actions"><button class="action secondary" id="resetTrade">Reset Trade Only</button><button class="action danger" id="resetAll">Reset Session</button></div>
-          </div>
-        </aside>
+      <div class="mini-stats">
+        <div class="stat-row"><span>Required checks</span><b id="requiredStat">0/0</b></div>
+        <div class="progress"><span id="requiredBar"></span></div>
+        <div class="stat-row"><span>Short bouncer</span><b id="shortStat">0/0</b></div>
+        <div class="stat-row"><span>Active blockers</span><b id="blockerStat" class="ok">0</b></div>
       </div>
     </section>
 
-    <section id="manage" class="tabPage"><div id="manageSections" class="grid sectionGrid" style="margin-top:16px"></div></section>
+    <nav class="tabs" id="tabs"></nav>
 
-    <section id="journal" class="tabPage">
-      <div class="mainGrid">
-        <div class="card">
-          <h2>Trade Journal</h2>
-          <p>Log the setup, even if the best trade was no trade.</p>
-          <div class="ticketGrid">
-            <label><span class="fieldLabel">Result in R</span><input id="resultR" placeholder="+2R, -1R, BE, No trade" /></label>
-            <label><span class="fieldLabel">Mistake</span><input id="mistake" placeholder="FOMO, chase, no mistake..." /></label>
-          </div>
-          <label style="margin-top:12px"><span class="fieldLabel">What I did well</span><textarea id="didWell"></textarea></label>
-          <div class="actions"><button id="saveJournal" class="action primary">Save Journal Entry</button></div>
-        </div>
-        <div class="card"><h3>Recent Logs</h3><div id="journalList"></div></div>
-      </div>
-    </section>
+    <section id="shortPage" class="grid layout"></section>
+    <section id="fullPage" class="grid layout hidden"></section>
+    <section id="checklistPage" class="grid grid-2 hidden"></section>
+    <section id="riskPage" class="grid layout hidden"></section>
+    <section id="managePage" class="grid grid-2 hidden"></section>
+    <section id="journalPage" class="grid layout hidden"></section>
+    <section id="studyPage" class="grid grid-2 hidden"></section>
 
-    <section id="study" class="tabPage"><div id="studySections" class="studyGrid" style="margin-top:16px"></div></section>
-
-    <footer>Education and practice tool only. The app approves process, not profit.</footer>
-  </div>
+    <footer>Education and practice tool only. The app approves discipline, not profit.</footer>
+  </main>
 
   <script>
     const requiredSections = {
-      hardRules: { title: "0. Hard Rules", subtitle: "If your head is cooked, the trade is denied.", items: [
-        "I am calm, not rushing, angry, bored, greedy, or trying to make money back.",
-        "I know my account size today.",
-        "I will risk exactly 1% max on one trade.",
-        "I will stop trading after 3% total loss in one day.",
-        "I will take max 3 trades today.",
-        "The trade must have at least 2R reward compared to risk.",
-        "I checked for major news or high-impact events before trading.",
-        "I will not trade just because price is moving fast.",
-        "I will not trade inside a no-trade zone.",
-        "I will not trade the indication by itself.",
-        "I will only enter after indication, correction, and continuation line up."
-      ]},
-      setup: { title: "1. Setup Foundation", subtitle: "No clean structure means no setup.", items: [
-        "TradingView is open and the chart is clean.", "I picked one main market for this session.", "The market has real movement and liquidity.", "I started from the higher timeframe, not 5M or 15M.", "1H is checked for day-trading structure.", "4H is checked for higher-timeframe structure.", "1D is checked if major context is needed.", "15M is checked for correction and entry precision.", "5M is used only if the 15M setup is already clean.", "15M, 1H, and 4H are aligned enough before entry."
-      ]},
-      markup: { title: "2. Markup Gate", subtitle: "Clean levels only. Spaghetti chart gets bounced.", items: [
-        "I found current price first.", "I found the closest important high near current price.", "I found the closest important low near current price.", "I marked previous swing highs.", "I marked previous swing lows.", "I marked seller zones above price.", "I marked buyer zones below price.", "I used only the cleanest levels, not every tiny candle.", "I used sessions only if they matter today.", "I used wick points as a guide, not as the whole reason.", "I did not build the trade idea from 15M or 5M."
-      ]},
-      icc: { title: "3. ICC Gate", subtitle: "Indication → Correction → Continuation. No shortcuts.", items: [
-        "Indication happened first: price broke a swing high or swing low.", "Correction happened after indication.", "Continuation is beginning after correction.", "The setup is near a marked buyer or seller zone.", "The setup is not random space in the middle.", "I am not chasing the breakout candle.", "I am reacting to structure, not predicting."
-      ]},
-      entry: { title: "4. Entry Gate", subtitle: "Every box must pass before GO.", items: [
-        "Higher-timeframe direction is clear.", "Market condition is identified: uptrend, downtrend, or consolidation.", "Key levels are marked.", "Price is not in a no-trade zone.", "Entry is on 15M or 5M only after the setup is clean.", "Entry is not based on FOMO, greed, revenge, or boredom.", "Stop loss is placed before entry.", "Target is placed before entry.", "Risk is calculated before entry.", "Reward is at least 2R.", "This trade matches my selected direction: Buy or Sell."
-      ]},
-      stopTarget: { title: "5. Stop Loss + Target Gate", subtitle: "Stop where the idea is wrong.", items: [
-        "Stop loss is not random.", "For a buy, stop is below recent swing low or buyer-zone invalidation.", "For a sell, stop is above recent swing high or seller-zone invalidation.", "If price hits stop loss, my trade idea is invalidated.", "Position size keeps risk at 1%.", "I will not move stop loss farther away after entry.", "Target is based on a real level, zone, or structure point.", "First target is at 2R or better.", "Soft TP is allowed near target if price reacts hard.", "If price reaches target area, I will not get greedy."
-      ]}
+      hardRules: {
+        title: "0. Hard Rules",
+        subtitle: "If your head is cooked, the trade is denied.",
+        items: [
+          "I am calm, not rushing, angry, bored, greedy, or trying to make money back.",
+          "I know my account size today.",
+          "I will risk exactly 1% max on one trade.",
+          "I will stop trading after 3% total loss in one day.",
+          "I will take max 3 trades today.",
+          "The trade must have at least 2R reward compared to risk.",
+          "I checked for major news or high-impact events before trading.",
+          "I will not trade just because price is moving fast.",
+          "I will not trade inside a no-trade zone.",
+          "I will not trade the indication by itself.",
+          "I will only enter after indication, correction, and continuation line up."
+        ]
+      },
+      setup: {
+        title: "1. Setup Foundation",
+        subtitle: "No clean structure means no setup.",
+        items: [
+          "TradingView is open and the chart is clean.",
+          "I picked one main market for this session.",
+          "The market has real movement and liquidity.",
+          "I started from the higher timeframe, not 5M or 15M.",
+          "1H is checked for day-trading structure.",
+          "4H is checked for higher-timeframe structure.",
+          "1D is checked if major context is needed.",
+          "15M is checked for correction and entry precision.",
+          "5M is used only if the 15M setup is already clean.",
+          "15M, 1H, and 4H are aligned enough before entry."
+        ]
+      },
+      markup: {
+        title: "2. Markup Gate",
+        subtitle: "Clean levels only. Spaghetti chart gets bounced.",
+        items: [
+          "I found current price first.",
+          "I found the closest important high near current price.",
+          "I found the closest important low near current price.",
+          "I marked previous swing highs.",
+          "I marked previous swing lows.",
+          "I marked seller zones above price.",
+          "I marked buyer zones below price.",
+          "I used only the cleanest levels, not every tiny candle.",
+          "I used sessions only if they matter today.",
+          "I used wick points as a guide, not as the whole reason.",
+          "I did not build the trade idea from 15M or 5M."
+        ]
+      },
+      icc: {
+        title: "3. ICC Gate",
+        subtitle: "Indication → Correction → Continuation. No shortcut.",
+        items: [
+          "Indication happened first: price broke a swing high or swing low.",
+          "Correction happened after indication.",
+          "Continuation is beginning after correction.",
+          "The setup is near a marked buyer or seller zone.",
+          "The setup is not random space in the middle.",
+          "I am not chasing the breakout candle.",
+          "I am reacting to structure, not predicting."
+        ]
+      },
+      entry: {
+        title: "4. Entry Gate",
+        subtitle: "Every box must pass before the app says GO.",
+        items: [
+          "Higher-timeframe direction is clear.",
+          "Market condition is identified: uptrend, downtrend, or consolidation.",
+          "Key levels are marked.",
+          "Price is not in a no-trade zone.",
+          "Entry is on 15M or 5M only after the setup is clean.",
+          "Entry is not based on FOMO, greed, revenge, or boredom.",
+          "Stop loss is placed before entry.",
+          "Target is placed before entry.",
+          "Risk is calculated before entry.",
+          "Reward is at least 2R.",
+          "This trade matches my selected direction: Buy or Sell."
+        ]
+      },
+      stopTarget: {
+        title: "5. Stop Loss + Target Gate",
+        subtitle: "Stop where the idea is wrong. Target where the chart pays.",
+        items: [
+          "Stop loss is not random.",
+          "For a buy, stop is below recent swing low or buyer-zone invalidation.",
+          "For a sell, stop is above recent swing high or seller-zone invalidation.",
+          "If price hits stop loss, my trade idea is invalidated.",
+          "Position size keeps risk at 1%.",
+          "I will not move stop loss farther away after entry.",
+          "Target is based on a real level, zone, or structure point.",
+          "First target is at 2R or better.",
+          "Soft TP is allowed near target if price reacts hard.",
+          "If price reaches target area, I will not get greedy."
+        ]
+      }
     };
-    const manageSections = {
-      management: { title: "Trade Management", subtitle: "After entry, protect the account.", items: ["I will not stare at every candle like it owes me money.", "I will not add random trades.", "I will not move stop loss farther away.", "I will not close early unless structure gives a valid reason.", "If higher support forms against my sell idea, I exit or reduce risk.", "If higher resistance forms against my buy idea, I exit or reduce risk.", "If target is hit, I take profit according to plan.", "If stop loss is hit, I accept it and log it."]},
-      exit: { title: "Exit Rules", subtitle: "Exit because the rule triggered.", items: ["Exit if stop loss is hit.", "Exit if target is hit.", "Exit if soft TP area is reached and price starts reacting.", "Exit if structure invalidates the trade.", "Exit if price starts forming opposite structure.", "Exit if I am emotionally losing discipline.", "Exit if daily loss limit is reached.", "Exit if I already took 3 trades today."]},
-      afterTrade: { title: "After Trade Routine", subtitle: "Screenshot, log, learn, leave.", items: ["Screenshot the trade or setup.", "Log entry reason, stop, target, and result.", "Write whether indication, correction, and continuation were present.", "Write what I did right and wrong.", "If no clean setup came, write: No clean setup.", "Walk away without forcing a trade."]}
+
+    const shortChecks = [
+      "Indication happened.",
+      "Correction happened after indication.",
+      "Continuation is starting.",
+      "Price is not inside a no-trade zone.",
+      "Setup is near my marked buyer/seller zone.",
+      "Stop loss is placed at invalidation.",
+      "Risk is exactly 1% or less.",
+      "Target is at least 2R.",
+      "I am calm, not chasing or revenge trading.",
+      "I already know where I will exit if wrong."
+    ];
+
+    const blockers = [
+      "Price is stuck between a marked high and low.",
+      "No swing high or swing low has been broken.",
+      "Price is chopping sideways.",
+      "Price is in the middle of the range.",
+      "The setup only looks good because I am forcing it.",
+      "I am trying to make back a loss.",
+      "I am entering because price is moving fast.",
+      "I am unsure but still want to click buy/sell."
+    ];
+
+    const managementSections = {
+      management: {
+        title: "Trade Management",
+        subtitle: "After entry, protect the account. No freestyle mode.",
+        items: [
+          "I will not stare at every candle like it owes me money.",
+          "I will not add random trades.",
+          "I will not move stop loss farther away.",
+          "I will not close early unless structure gives a valid reason.",
+          "If higher support forms against my sell idea, I exit or reduce risk.",
+          "If higher resistance forms against my buy idea, I exit or reduce risk.",
+          "If target is hit, I take profit according to plan.",
+          "If stop loss is hit, I accept it and log it."
+        ]
+      },
+      exit: {
+        title: "Exit Rules",
+        subtitle: "Exit because the rule triggered, not because vibes got loud.",
+        items: [
+          "Exit if stop loss is hit.",
+          "Exit if target is hit.",
+          "Exit if soft TP area is reached and price starts reacting.",
+          "Exit if structure invalidates the trade.",
+          "Exit if price starts forming opposite structure.",
+          "Exit if I am emotionally losing discipline.",
+          "Exit if daily loss limit is reached.",
+          "Exit if I already took 3 trades today."
+        ]
+      },
+      after: {
+        title: "After Trade Routine",
+        subtitle: "Screenshot, log, learn, leave.",
+        items: [
+          "Screenshot the trade or setup.",
+          "Log entry reason, stop, target, and result.",
+          "Write whether indication, correction, and continuation were present.",
+          "Write what I did right and wrong.",
+          "If no clean setup came, write: No clean setup.",
+          "Walk away without forcing a trade."
+        ]
+      }
     };
-    const blockers = ["Price is stuck between a marked high and low.", "No swing high or swing low has been broken.", "Price is chopping sideways.", "Price is in the middle of the range.", "The setup only looks good because I am forcing it.", "I am trying to make back a loss.", "I am entering because price is moving fast.", "I am unsure but still want to click buy/sell."];
-    const flow = ["Clear chart.", "Check 1H, 4H, and 1D if needed.", "Mark closest swing high and low.", "Mark buyer and seller zones.", "Identify trend or consolidation.", "Wait for indication.", "Wait for correction.", "Wait for continuation.", "Use 15M or 5M for entry precision.", "Place stop at invalidation.", "Confirm 1% risk and 2R minimum.", "Only enter when the bouncer says GO.", "Manage by rules.", "Log the result."];
-    const study = [
+
+    const studyCards = [
       ["Structure Drill", ["Open replay.", "Mark HH, HL, LH, LL.", "Label uptrend, downtrend, or consolidation.", "Do not look for entries yet."]],
       ["Markup Drill", ["Start on 1H.", "Mark current price, closest high, closest low.", "Mark buyer and seller zones.", "Use only clean levels."]],
       ["ICC Drill", ["Find indication.", "Wait for correction.", "Identify continuation.", "Write whether you would buy, sell, or wait."]],
-      ["Flashcards", ["Indication = break above swing high or below swing low.", "Do not trade indication alone.", "After indication comes correction.", "After correction comes continuation.", "Markup on 1H and higher.", "Entry on 15M or 5M.", "Max risk per trade is 1%.", "Daily loss stop is 3%.", "Max trades per day is 3."]]
+      ["No-Trade Drill", ["Find ranges with high and low but no indication.", "Box them.", "Practice doing nothing. Boring but elite."]],
+      ["Review Drill", ["Screenshot 10 old setups.", "Write if each entry followed the checklist.", "Find your repeated mistake."]]
     ];
-    let state = JSON.parse(localStorage.getItem('trading-bouncer-static') || '{"checked":{},"blockers":{},"journal":[]}');
-    function $(id){ return document.getElementById(id); }
-    function val(id){ return ($(id)?.value || '').trim(); }
-    function number(id){ const n = Number(val(id)); return Number.isFinite(n) ? n : 0; }
-    function save(){ localStorage.setItem('trading-bouncer-static', JSON.stringify(state)); }
-    function makeChecks(containerId, sections, blocker=false){
-      const container = $(containerId); container.innerHTML = '';
-      Object.entries(sections).forEach(([key, sec]) => {
-        const card = document.createElement('div'); card.className = 'card';
-        card.innerHTML = `<div class="sectionTitle"><div><h3>${sec.title}</h3><p>${sec.subtitle}</p></div><span class="pill" id="pill-${key}">0/${sec.items.length}</span></div><div class="checks" id="checks-${key}"></div>`;
-        container.appendChild(card);
-        sec.items.forEach((item, i) => addCheck(`checks-${key}`, `${key}-${i}`, item, false));
-      });
+
+    const flashcards = [
+      ["What is indication?", "A break above a swing high or below a swing low."],
+      ["Do you trade indication alone?", "No. Use it as information only."],
+      ["What comes after indication?", "Correction."],
+      ["What comes after correction?", "Continuation."],
+      ["Markup timeframe?", "1H and higher."],
+      ["Entry timeframe?", "15M or 5M."],
+      ["Max risk per trade?", "1%."],
+      ["Daily loss stop?", "3%."],
+      ["Max trades per day?", "3 trades."]
+    ];
+
+    const emptyTicket = {
+      market: "",
+      session: "",
+      accountSize: "500",
+      side: "Wait",
+      trend: "",
+      entryPrice: "",
+      stopLoss: "",
+      target: "",
+      tradesTaken: "0",
+      dailyLossPct: "0",
+      zone: "",
+      reason: "",
+      resultR: "",
+      mistake: "",
+      didWell: ""
+    };
+
+    let state = loadState();
+    let activeTab = "Short Bouncer";
+
+    function loadState() {
+      try {
+        const raw = localStorage.getItem("trading-bouncer-onefile-v3");
+        if (!raw) return { checked: {}, blockerChecked: {}, ticket: {...emptyTicket}, journal: [] };
+        const parsed = JSON.parse(raw);
+        return {
+          checked: parsed.checked || {},
+          blockerChecked: parsed.blockerChecked || {},
+          ticket: { ...emptyTicket, ...(parsed.ticket || {}) },
+          journal: parsed.journal || []
+        };
+      } catch {
+        return { checked: {}, blockerChecked: {}, ticket: {...emptyTicket}, journal: [] };
+      }
     }
-    function addCheck(containerId, id, text, isBlocker){
-      const btn = document.createElement('button'); btn.className = 'checkBtn' + (isBlocker ? ' blocker' : ''); btn.dataset.id = id;
-      btn.innerHTML = `<span class="box">✓</span><span class="checkText">${text}</span>`;
-      btn.onclick = () => { const store = isBlocker ? state.blockers : state.checked; store[id] = !store[id]; save(); render(); };
-      $(containerId).appendChild(btn);
+
+    function saveState() {
+      localStorage.setItem("trading-bouncer-onefile-v3", JSON.stringify(state));
     }
-    function init(){
-      makeChecks('requiredSections', requiredSections);
-      makeChecks('manageSections', manageSections);
-      blockers.forEach((b,i)=>addCheck('blockers', `blocker-${i}`, b, true));
-      flow.forEach(f=>{ const li=document.createElement('li'); li.textContent=f; $('flow').appendChild(li); });
-      study.forEach(([name, items])=>{ const card=document.createElement('div'); card.className='card'; card.innerHTML=`<h3>${name}</h3><ul>${items.map(x=>`<li>${x}</li>`).join('')}</ul>`; $('studySections').appendChild(card); });
-      document.querySelectorAll('.tab').forEach(t => t.onclick = () => { document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active')); document.querySelectorAll('.tabPage').forEach(x=>x.classList.remove('active')); t.classList.add('active'); $(t.dataset.tab).classList.add('active'); });
-      ['market','session','accountSize','side','trend','zone','entryPrice','stopLoss','target','tradesTaken','dailyLossPct','reason','resultR','mistake','didWell'].forEach(id=>{
-        if(state[id] !== undefined && $(id)) $(id).value = state[id];
-        if($(id)) $(id).addEventListener('input', () => { state[id] = $(id).value; save(); render(); });
-        if($(id)) $(id).addEventListener('change', () => { state[id] = $(id).value; save(); render(); });
+
+    function n(v) {
+      const x = Number(v);
+      return Number.isFinite(x) ? x : 0;
+    }
+
+    function idsFrom(sections) {
+      return Object.entries(sections).flatMap(([key, section]) => section.items.map((_, i) => `${key}-${i}`));
+    }
+
+    const requiredIds = idsFrom(requiredSections);
+    const shortIds = shortChecks.map((_, i) => `short-${i}`);
+    const managementIds = idsFrom(managementSections);
+
+    function math() {
+      const account = n(state.ticket.accountSize);
+      const entry = n(state.ticket.entryPrice);
+      const stop = n(state.ticket.stopLoss);
+      const target = n(state.ticket.target);
+      const riskDistance = Math.abs(entry - stop);
+      const rewardDistance = Math.abs(target - entry);
+      const rr = riskDistance > 0 ? rewardDistance / riskDistance : 0;
+      return {
+        account,
+        entry,
+        stop,
+        target,
+        trades: n(state.ticket.tradesTaken),
+        loss: n(state.ticket.dailyLossPct),
+        riskAmount: account * .01,
+        riskDistance,
+        rewardDistance,
+        rr,
+        units: riskDistance > 0 ? (account * .01) / riskDistance : 0
+      };
+    }
+
+    function directionValid(m) {
+      if (state.ticket.side === "Buy") return m.stop > 0 && m.entry > 0 && m.target > 0 && m.stop < m.entry && m.target > m.entry;
+      if (state.ticket.side === "Sell") return m.stop > 0 && m.entry > 0 && m.target > 0 && m.stop > m.entry && m.target < m.entry;
+      return false;
+    }
+
+    function baseReasons(m) {
+      const reasons = [];
+      const blockerCount = Object.values(state.blockerChecked).filter(Boolean).length;
+      if (!state.ticket.market.trim()) reasons.push("Choose one market.");
+      if (!state.ticket.session.trim()) reasons.push("Write the session or time window.");
+      if (m.account <= 0) reasons.push("Account size must be filled in.");
+      if (state.ticket.side === "Wait") reasons.push("Choose Buy or Sell.");
+      if (!state.ticket.trend || state.ticket.trend === "Consolidation") reasons.push("Trend must be clear. Consolidation means no trade.");
+      if (!state.ticket.zone.trim()) reasons.push("Write the buyer/seller zone.");
+      if (m.trades >= 3) reasons.push("Max 3 trades reached.");
+      if (m.loss >= 3) reasons.push("Daily loss limit reached.");
+      if (blockerCount > 0) reasons.push("A no-trade blocker is active.");
+      if (m.entry <= 0 || m.stop <= 0 || m.target <= 0) reasons.push("Entry, stop loss, and target must be filled.");
+      if (m.entry > 0 && m.stop > 0 && m.target > 0 && !directionValid(m)) reasons.push("Direction math is wrong for Buy/Sell.");
+      if (m.rr < 2) reasons.push("Reward-to-risk must be at least 2R.");
+      return reasons;
+    }
+
+    function shortReasons() {
+      const m = math();
+      const reasons = baseReasons(m);
+      shortIds.forEach((id, i) => {
+        if (!state.checked[id]) reasons.push(shortChecks[i]);
       });
-      $('resetTrade').onclick=()=>{ ['side','trend','zone','entryPrice','stopLoss','target','reason','resultR','mistake','didWell'].forEach(id=>{ if($(id)) { $(id).value = id==='side' ? 'Wait' : ''; state[id]=$(id).value; }}); state.checked={}; state.blockers={}; save(); render(); };
-      $('resetAll').onclick=()=>{ localStorage.removeItem('trading-bouncer-static'); location.reload(); };
-      $('saveJournal').onclick=()=>{ const m = getMath(); state.journal = state.journal || []; state.journal.unshift({date:new Date().toLocaleString(), market:val('market')||'No market', side:val('side'), result:val('resultR'), approved:getDecision(m).allowed?'Yes':'No', rr:m.rr.toFixed(2), reason:val('reason'), mistake:val('mistake'), didWell:val('didWell')}); state.journal = state.journal.slice(0,50); save(); renderJournal(); };
+      return { reasons, m };
+    }
+
+    function fullReasons() {
+      const m = math();
+      const reasons = baseReasons(m);
+      if (!state.ticket.reason.trim()) reasons.push("Write why this trade is valid before entry.");
+      requiredIds.forEach(id => {
+        if (!state.checked[id]) {
+          const [key, index] = id.split("-");
+          reasons.push(requiredSections[key].items[Number(index)]);
+        }
+      });
+      return { reasons, m };
+    }
+
+    function decisionObj(reasons, m) {
+      const blockersActive = Object.values(state.blockerChecked).some(Boolean);
+      const locked = m.trades >= 3 || m.loss >= 3 || blockersActive;
+      if (reasons.length === 0) return { type: "go", title: "GO AHEAD", message: "Approved. Enter only with the planned risk." };
+      if (locked) return { type: "no", title: "ACCESS DENIED", message: "Hard rule or blocker shut this trade down." };
+      return { type: "wait", title: "NOT YET", message: "Fix the missing checks before entry." };
+    }
+
+    function setTicket(key, value) {
+      state.ticket[key] = value;
+      saveState();
       render();
     }
-    function getMath(){ const account=number('accountSize'), entry=number('entryPrice'), stop=number('stopLoss'), target=number('target'); const riskAmount=account*.01; const riskDistance=Math.abs(entry-stop); const rewardDistance=Math.abs(target-entry); const rr=riskDistance>0?rewardDistance/riskDistance:0; const units=riskDistance>0?riskAmount/riskDistance:0; return {account, entry, stop, target, riskAmount, riskDistance, rewardDistance, rr, units}; }
-    function getDecision(m){
-      const reasons=[]; const side=val('side'), trend=val('trend'), blockersActive=Object.values(state.blockers||{}).filter(Boolean).length;
-      if(!val('market')) reasons.push('Choose one market for the session.');
-      if(!val('session')) reasons.push('Write the session or time window.');
-      if(m.account<=0) reasons.push('Account size must be filled in.');
-      if(side==='Wait') reasons.push('Direction must be Buy or Sell, not Wait.');
-      if(!trend || trend==='Consolidation') reasons.push('Trend must be clear. Consolidation means no trade.');
-      if(!val('zone')) reasons.push('Write the buyer or seller zone being used.');
-      if(!val('reason')) reasons.push('Write why this trade is valid before entry.');
-      if(number('tradesTaken')>=3) reasons.push('Max 3 trades reached. Session locked.');
-      if(number('dailyLossPct')>=3) reasons.push('Daily loss limit reached. Session locked.');
-      if(blockersActive>0) reasons.push('A no-trade blocker is checked.');
-      if(m.entry<=0) reasons.push('Entry price is missing.');
-      if(m.stop<=0) reasons.push('Stop loss price is missing.');
-      if(m.target<=0) reasons.push('Target price is missing.');
-      const buyOk=side==='Buy' && m.stop<m.entry && m.target>m.entry; const sellOk=side==='Sell' && m.stop>m.entry && m.target<m.entry;
-      if(m.entry>0 && m.stop>0 && m.target>0 && !(buyOk||sellOk)) reasons.push('Buy needs stop below entry and target above entry. Sell needs stop above entry and target below entry.');
-      if(m.rr<2) reasons.push('Reward-to-risk must be at least 2R.');
-      Object.entries(requiredSections).forEach(([key,sec])=>sec.items.forEach((item,i)=>{ if(!state.checked[`${key}-${i}`]) reasons.push(item); }));
-      const locked=number('tradesTaken')>=3 || number('dailyLossPct')>=3 || blockersActive>0;
-      return {reasons, allowed:reasons.length===0, locked};
+
+    function toggleCheck(id) {
+      state.checked[id] = !state.checked[id];
+      saveState();
+      render();
     }
-    function setStatus(el, d){ el.className='statusBox ' + (d.allowed?'go':d.locked?'deny':'wait'); el.querySelector('strong').textContent=d.allowed?'GO AHEAD':d.locked?'ACCESS DENIED':'NOT YET'; el.querySelector('span').textContent=d.allowed?'Trade approved. Use planned 1% risk.':d.locked?'Door closed. Do not enter this trade.':'Fix the failed rules first.'; }
-    function render(){
-      document.querySelectorAll('.checkBtn').forEach(btn=>{ const id=btn.dataset.id; const active=btn.classList.contains('blocker') ? state.blockers[id] : state.checked[id]; btn.classList.toggle('active', !!active); });
-      Object.entries(requiredSections).forEach(([key,sec])=>{ const done=sec.items.filter((_,i)=>state.checked[`${key}-${i}`]).length; const p=$(`pill-${key}`); if(p){ p.textContent=`${done}/${sec.items.length}`; p.classList.toggle('ok', done===sec.items.length); }});
-      Object.entries(manageSections).forEach(([key,sec])=>{ const done=sec.items.filter((_,i)=>state.checked[`${key}-${i}`]).length; const p=$(`pill-${key}`); if(p){ p.textContent=`${done}/${sec.items.length}`; p.classList.toggle('ok', done===sec.items.length); }});
-      const blockerCount=Object.values(state.blockers||{}).filter(Boolean).length; $('blockerPill').textContent=blockerCount?`${blockerCount} active`:'clear'; $('blockerPill').className='pill '+(blockerCount?'bad':'ok');
-      const m=getMath(); $('riskAmount').textContent='$'+m.riskAmount.toFixed(2); $('rr').textContent=(m.rr?m.rr.toFixed(2):'0.00')+'R'; $('rr').style.color=m.rr>=2?'var(--green)':'var(--red)'; $('riskDistance').textContent=m.riskDistance.toFixed(2); $('units').textContent=Number.isFinite(m.units)?m.units.toFixed(4):'0';
-      const d=getDecision(m); setStatus($('heroStatus'), d); setStatus($('sideStatus'), d); $('reasons').innerHTML=d.reasons.length?d.reasons.slice(0,14).map(r=>`<li>${r}</li>`).join(''):'<li style="color:var(--green)">No failed rules. Go ahead, but only with the planned risk.</li>';
-      renderJournal();
+
+    function toggleBlocker(id) {
+      state.blockerChecked[id] = !state.blockerChecked[id];
+      saveState();
+      render();
     }
-    function renderJournal(){ const list=$('journalList'); const rows=state.journal||[]; list.innerHTML=rows.length?rows.map(r=>`<div class="journalItem"><b>${r.market} · ${r.side}</b><small>${r.date}</small><p>Approved: ${r.approved} · R:R ${r.rr} · Result: ${r.result||'No result'}</p>${r.reason?`<p><b>Reason:</b> ${r.reason}</p>`:''}${r.mistake?`<p><b>Mistake:</b> ${r.mistake}</p>`:''}${r.didWell?`<p><b>Good:</b> ${r.didWell}</p>`:''}</div>`).join(''):'<p>No journal entries yet.</p>'; }
-    init();
+
+    function inputField(label, key, type = "text", placeholder = "") {
+      const value = state.ticket[key] || "";
+      return `<label><span>${label}</span><input type="${type}" value="${escapeAttr(value)}" placeholder="${placeholder}" oninput="setTicket('${key}', this.value)"></label>`;
+    }
+
+    function selectField(label, key, options) {
+      const value = state.ticket[key] || "";
+      return `<label><span>${label}</span><select onchange="setTicket('${key}', this.value)">${options.map(o => `<option ${o === value ? "selected" : ""}>${o}</option>`).join("")}</select></label>`;
+    }
+
+    function escapeAttr(str) {
+      return String(str ?? "").replace(/&/g, "&amp;").replace(/"/g, "&quot;").replace(/</g, "&lt;");
+    }
+
+    function escapeHtml(str) {
+      return String(str ?? "").replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+    }
+
+    function checkButton(id, text, blocker = false) {
+      const on = blocker ? Boolean(state.blockerChecked[id]) : Boolean(state.checked[id]);
+      const fn = blocker ? "toggleBlocker" : "toggleCheck";
+      return `<button class="check ${blocker ? "blocker" : ""} ${on ? "on" : ""}" onclick="${fn}('${id}')"><span class="box">${blocker ? "!" : "✓"}</span><span>${escapeHtml(text)}</span></button>`;
+    }
+
+    function sectionHtml(key, section) {
+      const done = section.items.filter((_, i) => state.checked[`${key}-${i}`]).length;
+      return `<div class="card">
+        <div class="section-head">
+          <div><h3>${section.title}</h3><p class="sub">${section.subtitle}</p></div>
+          <span class="pill">${done}/${section.items.length}</span>
+        </div>
+        <div class="check-list">${section.items.map((item, i) => checkButton(`${key}-${i}`, item)).join("")}</div>
+      </div>`;
+    }
+
+    function ticketFields(includeReason = false) {
+      return `<div class="card">
+        <h2>Trade Ticket</h2>
+        <p class="sub">The bouncer checks these fields plus the boxes.</p>
+        <div class="fields">
+          ${inputField("Market", "market", "text", "NAS100, Gold, SPY...")}
+          ${inputField("Session", "session", "text", "NY open, London...")}
+          ${inputField("Account Size", "accountSize", "number")}
+          ${selectField("Side", "side", ["Wait", "Buy", "Sell"])}
+          ${selectField("Trend", "trend", ["", "Uptrend", "Downtrend", "Consolidation"])}
+          ${inputField("Zone Used", "zone", "text", "Buyer zone, seller zone...")}
+          ${inputField("Entry Price", "entryPrice", "number")}
+          ${inputField("Stop Loss", "stopLoss", "number")}
+          ${inputField("Target", "target", "number")}
+          ${inputField("Trades Taken", "tradesTaken", "number")}
+          ${inputField("Daily Loss %", "dailyLossPct", "number")}
+          ${includeReason ? `<label class="span-all"><span>Why this trade is valid</span><textarea oninput="setTicket('reason', this.value)" placeholder="Example: bullish indication, correction into buyer zone, continuation starting...">${escapeHtml(state.ticket.reason)}</textarea></label>` : ""}
+        </div>
+      </div>`;
+    }
+
+    function blockersHtml(title = "Instant Blockers") {
+      const count = Object.values(state.blockerChecked).filter(Boolean).length;
+      return `<div class="card">
+        <div class="section-head">
+          <div><h2>${title}</h2><p class="sub">If any of these are true, the trade is dead.</p></div>
+          <span class="pill ${count ? "bad" : "ok"}">${count ? count + " active" : "clear"}</span>
+        </div>
+        <div class="check-list">${blockers.map((item, i) => checkButton(`blocker-${i}`, item, true)).join("")}</div>
+      </div>`;
+    }
+
+    function bouncerPanel(mode = "short") {
+      const result = mode === "short" ? shortReasons() : fullReasons();
+      const decision = decisionObj(result.reasons, result.m);
+      const reasons = result.reasons.slice(0, 14);
+      return `<div class="sticky">
+        <div class="card">
+          <div class="decision ${decision.type}">
+            <small>Trading Bouncer</small>
+            <strong>${decision.title}</strong>
+            <p>${decision.message}</p>
+          </div>
+          <div class="math-grid">
+            <div class="math"><span>1% Risk</span><b>$${result.m.riskAmount.toFixed(2)}</b></div>
+            <div class="math"><span>R:R</span><b class="${result.m.rr >= 2 ? "ok" : "bad"}">${result.m.rr ? result.m.rr.toFixed(2) : "0.00"}R</b></div>
+            <div class="math"><span>Risk Distance</span><b>${result.m.riskDistance.toFixed(2)}</b></div>
+            <div class="math"><span>Units</span><b>${Number.isFinite(result.m.units) ? result.m.units.toFixed(4) : "0"}</b></div>
+          </div>
+          <div class="reasons">
+            <h3>Denied Until Fixed</h3>
+            ${result.reasons.length === 0 ? `<p class="ok">No failed rules. Go ahead with planned risk.</p>` : `<ul>${reasons.map(r => `<li>${escapeHtml(r)}</li>`).join("")}${result.reasons.length > 14 ? `<li>+ ${result.reasons.length - 14} more failed rules.</li>` : ""}</ul>`}
+          </div>
+        </div>
+      </div>`;
+    }
+
+    function renderShortPage() {
+      const done = shortIds.filter(id => state.checked[id]).length;
+      document.getElementById("shortPage").innerHTML = `
+        <div class="grid">
+          ${ticketFields(false)}
+          <div class="card">
+            <div class="section-head">
+              <div><h2>Short Bouncer</h2><p class="sub">Use this right before entry. Fast 30 to 60 second gate.</p></div>
+              <span class="pill">${done}/${shortChecks.length}</span>
+            </div>
+            <div class="check-list">${shortChecks.map((item, i) => checkButton(`short-${i}`, item)).join("")}</div>
+          </div>
+          ${blockersHtml("Instant Blockers")}
+        </div>
+        ${bouncerPanel("short")}
+      `;
+    }
+
+    function renderFullPage() {
+      document.getElementById("fullPage").innerHTML = `
+        <div class="grid">
+          ${ticketFields(true)}
+          ${blockersHtml("No-Trade Blockers")}
+          <div class="grid grid-2">${Object.entries(requiredSections).map(([key, sec]) => sectionHtml(key, sec)).join("")}</div>
+        </div>
+        ${bouncerPanel("full")}
+      `;
+    }
+
+    function renderChecklistPage() {
+      document.getElementById("checklistPage").innerHTML = Object.entries(requiredSections).map(([key, sec]) => sectionHtml(key, sec)).join("");
+    }
+
+    function renderRiskPage() {
+      document.getElementById("riskPage").innerHTML = `
+        <div class="grid">
+          ${ticketFields(false)}
+          ${sectionHtml("stopTarget", requiredSections.stopTarget)}
+        </div>
+        ${bouncerPanel("short")}
+      `;
+    }
+
+    function renderManagePage() {
+      document.getElementById("managePage").innerHTML = Object.entries(managementSections).map(([key, sec]) => sectionHtml(key, sec)).join("");
+    }
+
+    function renderJournalPage() {
+      const logs = state.journal.map(row => `
+        <div class="log">
+          <b>${escapeHtml(row.market)} · ${escapeHtml(row.side)}</b>
+          <p class="sub">${escapeHtml(row.date)} · Approved: ${escapeHtml(row.approved)} · R:R ${escapeHtml(row.rr)}</p>
+          ${row.resultR ? `<p><b>Result:</b> ${escapeHtml(row.resultR)}</p>` : ""}
+          ${row.reason ? `<p><b>Reason:</b> ${escapeHtml(row.reason)}</p>` : ""}
+          ${row.mistake ? `<p class="bad"><b>Mistake:</b> ${escapeHtml(row.mistake)}</p>` : ""}
+          ${row.didWell ? `<p class="ok"><b>Good:</b> ${escapeHtml(row.didWell)}</p>` : ""}
+        </div>
+      `).join("");
+
+      document.getElementById("journalPage").innerHTML = `
+        <div class="card">
+          <h2>Trade Journal</h2>
+          <p class="sub">Log the setup even if the best trade was no trade.</p>
+          <div class="fields">
+            ${inputField("Result in R", "resultR", "text", "+2R, -1R, BE, No trade")}
+            ${inputField("Mistake", "mistake", "text", "FOMO, chase, no mistake...")}
+            <label class="span-all"><span>What I did well</span><textarea oninput="setTicket('didWell', this.value)">${escapeHtml(state.ticket.didWell)}</textarea></label>
+          </div>
+          <div class="actions">
+            <button class="btn" onclick="saveJournal()">Save Journal Entry</button>
+            <button class="btn secondary" onclick="resetTrade()">Reset Trade Only</button>
+            <button class="btn danger" onclick="resetSession()">Reset Session</button>
+          </div>
+        </div>
+        <div class="card sticky">
+          <h3>Recent Logs</h3>
+          ${state.journal.length ? logs : `<p class="sub">No journal entries yet.</p>`}
+        </div>
+      `;
+    }
+
+    function renderStudyPage() {
+      document.getElementById("studyPage").innerHTML = `
+        <div class="card">
+          <h2>Study Mode</h2>
+          <p class="sub">Use this outside live trading. Do not bring all study notes into the live gate.</p>
+          <div class="check-list">${studyCards.map(([name, items]) => `<div class="log"><b>${name}</b><ul>${items.map(i => `<li>${i}</li>`).join("")}</ul></div>`).join("")}</div>
+        </div>
+        <div class="card">
+          <h2>Flashcards</h2>
+          <div class="check-list">${flashcards.map(([q, a]) => `<details class="log"><summary><b>${q}</b></summary><p>${a}</p></details>`).join("")}</div>
+        </div>
+      `;
+    }
+
+    function saveJournal() {
+      const fr = fullReasons();
+      state.journal.unshift({
+        id: Date.now(),
+        date: new Date().toLocaleString(),
+        market: state.ticket.market || "No market",
+        side: state.ticket.side,
+        approved: fr.reasons.length === 0 ? "Yes" : "No",
+        rr: fr.m.rr ? fr.m.rr.toFixed(2) : "0.00",
+        resultR: state.ticket.resultR,
+        reason: state.ticket.reason,
+        mistake: state.ticket.mistake,
+        didWell: state.ticket.didWell
+      });
+      state.journal = state.journal.slice(0, 50);
+      saveState();
+      render();
+    }
+
+    function resetTrade() {
+      const keep = {
+        market: state.ticket.market,
+        session: state.ticket.session,
+        accountSize: state.ticket.accountSize,
+        tradesTaken: state.ticket.tradesTaken,
+        dailyLossPct: state.ticket.dailyLossPct
+      };
+      state.checked = {};
+      state.blockerChecked = {};
+      state.ticket = { ...emptyTicket, ...keep };
+      saveState();
+      render();
+    }
+
+    function resetSession() {
+      state.checked = {};
+      state.blockerChecked = {};
+      state.ticket = { ...emptyTicket };
+      saveState();
+      render();
+    }
+
+    function switchTab(tab) {
+      activeTab = tab;
+      render();
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+
+    function renderTabs() {
+      const tabs = ["Short Bouncer", "Full Bouncer", "Checklist", "Risk", "Manage", "Journal", "Study"];
+      document.getElementById("tabs").innerHTML = tabs.map(t => `<button class="tab ${activeTab === t ? "active" : ""}" onclick="switchTab('${t}')">${t}</button>`).join("");
+    }
+
+    function renderStats() {
+      const requiredDone = requiredIds.filter(id => state.checked[id]).length;
+      const shortDone = shortIds.filter(id => state.checked[id]).length;
+      const blockerCount = Object.values(state.blockerChecked).filter(Boolean).length;
+      document.getElementById("requiredStat").textContent = `${requiredDone}/${requiredIds.length}`;
+      document.getElementById("shortStat").textContent = `${shortDone}/${shortIds.length}`;
+      document.getElementById("blockerStat").textContent = blockerCount;
+      document.getElementById("blockerStat").className = blockerCount ? "bad" : "ok";
+      document.getElementById("requiredBar").style.width = `${requiredIds.length ? Math.round(requiredDone / requiredIds.length * 100) : 0}%`;
+    }
+
+    function renderPages() {
+      const pageMap = {
+        "Short Bouncer": "shortPage",
+        "Full Bouncer": "fullPage",
+        "Checklist": "checklistPage",
+        "Risk": "riskPage",
+        "Manage": "managePage",
+        "Journal": "journalPage",
+        "Study": "studyPage"
+      };
+      Object.values(pageMap).forEach(id => document.getElementById(id).classList.add("hidden"));
+      document.getElementById(pageMap[activeTab]).classList.remove("hidden");
+      renderShortPage();
+      renderFullPage();
+      renderChecklistPage();
+      renderRiskPage();
+      renderManagePage();
+      renderJournalPage();
+      renderStudyPage();
+    }
+
+    function render() {
+      renderTabs();
+      renderStats();
+      renderPages();
+    }
+
+    render();
   </script>
 </body>
 </html>
