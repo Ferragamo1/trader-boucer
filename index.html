@@ -379,6 +379,7 @@
     }
     .btn.secondary { background: #e2e8f0; color: #0f172a; }
     .btn.danger { background: var(--red-soft); color: #991b1b; }
+    .btn.full { width: 100%; margin-top: 10px; }
 
     .log {
       border: 1px solid var(--line);
@@ -413,6 +414,7 @@
         <div class="progress"><span id="requiredBar"></span></div>
         <div class="stat-row"><span>Short bouncer</span><b id="shortStat">0/0</b></div>
         <div class="stat-row"><span>Active blockers</span><b id="blockerStat" class="ok">0</b></div>
+        <button class="btn danger full" onclick="freshStart()" type="button">Fresh Start</button>
       </div>
     </section>
 
@@ -750,7 +752,7 @@
     function setTicket(key, value) {
       state.ticket[key] = value;
       saveState();
-      render();
+      refreshLivePanels();
     }
 
     function toggleCheck(id) {
@@ -832,29 +834,38 @@
       </div>`;
     }
 
-    function bouncerPanel(mode = "short") {
+    function bouncerPanelInner(mode = "short") {
       const result = mode === "short" ? shortReasons() : fullReasons();
       const decision = decisionObj(result.reasons, result.m);
       const reasons = result.reasons.slice(0, 14);
-      return `<div class="sticky">
-        <div class="card">
-          <div class="decision ${decision.type}">
-            <small>Trading Bouncer</small>
-            <strong>${decision.title}</strong>
-            <p>${decision.message}</p>
-          </div>
-          <div class="math-grid">
-            <div class="math"><span>1% Risk</span><b>$${result.m.riskAmount.toFixed(2)}</b></div>
-            <div class="math"><span>R:R</span><b class="${result.m.rr >= 2 ? "ok" : "bad"}">${result.m.rr ? result.m.rr.toFixed(2) : "0.00"}R</b></div>
-            <div class="math"><span>Risk Distance</span><b>${result.m.riskDistance.toFixed(2)}</b></div>
-            <div class="math"><span>Units</span><b>${Number.isFinite(result.m.units) ? result.m.units.toFixed(4) : "0"}</b></div>
-          </div>
-          <div class="reasons">
-            <h3>Denied Until Fixed</h3>
-            ${result.reasons.length === 0 ? `<p class="ok">No failed rules. Go ahead with planned risk.</p>` : `<ul>${reasons.map(r => `<li>${escapeHtml(r)}</li>`).join("")}${result.reasons.length > 14 ? `<li>+ ${result.reasons.length - 14} more failed rules.</li>` : ""}</ul>`}
-          </div>
+      return `<div class="card">
+        <div class="decision ${decision.type}">
+          <small>Trading Bouncer</small>
+          <strong>${decision.title}</strong>
+          <p>${decision.message}</p>
+        </div>
+        <div class="math-grid">
+          <div class="math"><span>1% Risk</span><b>$${result.m.riskAmount.toFixed(2)}</b></div>
+          <div class="math"><span>R:R</span><b class="${result.m.rr >= 2 ? "ok" : "bad"}">${result.m.rr ? result.m.rr.toFixed(2) : "0.00"}R</b></div>
+          <div class="math"><span>Risk Distance</span><b>${result.m.riskDistance.toFixed(2)}</b></div>
+          <div class="math"><span>Units</span><b>${Number.isFinite(result.m.units) ? result.m.units.toFixed(4) : "0"}</b></div>
+        </div>
+        <div class="reasons">
+          <h3>Denied Until Fixed</h3>
+          ${result.reasons.length === 0 ? `<p class="ok">No failed rules. Go ahead with planned risk.</p>` : `<ul>${reasons.map(r => `<li>${escapeHtml(r)}</li>`).join("")}${result.reasons.length > 14 ? `<li>+ ${result.reasons.length - 14} more failed rules.</li>` : ""}</ul>`}
         </div>
       </div>`;
+    }
+
+    function bouncerPanel(mode = "short") {
+      return `<div class="sticky bouncer-panel" data-mode="${mode}">${bouncerPanelInner(mode)}</div>`;
+    }
+
+    function refreshLivePanels() {
+      renderStats();
+      document.querySelectorAll(".bouncer-panel").forEach(panel => {
+        panel.innerHTML = bouncerPanelInner(panel.dataset.mode || "short");
+      });
     }
 
     function renderShortPage() {
@@ -928,7 +939,7 @@
           <div class="actions">
             <button class="btn" onclick="saveJournal()">Save Journal Entry</button>
             <button class="btn secondary" onclick="resetTrade()">Reset Trade Only</button>
-            <button class="btn danger" onclick="resetSession()">Reset Session</button>
+            <button class="btn danger" onclick="freshStart()">Fresh Start</button>
           </div>
         </div>
         <div class="card sticky">
@@ -987,6 +998,10 @@
     }
 
     function resetSession() {
+      freshStart();
+    }
+
+    function freshStart() {
       state.checked = {};
       state.blockerChecked = {};
       state.ticket = { ...emptyTicket };
