@@ -1,0 +1,929 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="theme-color" content="#000000">
+<title>Trading Bouncer</title>
+<style>
+  * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  :root {
+    --bg: #000000;
+    --card: #1C1C1E;
+    --card2: #2C2C2E;
+    --text: #FFFFFF;
+    --sub: #98989F;
+    --blue: #0A84FF;
+    --green: #30D158;
+    --red: #FF453A;
+    --amber: #FF9F0A;
+    --line: #38383A;
+    --radius: 16px;
+  }
+  html, body {
+    margin: 0; padding: 0;
+    background: var(--bg); color: var(--text);
+    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Helvetica Neue", sans-serif;
+    font-size: 17px; line-height: 1.45;
+    -webkit-font-smoothing: antialiased;
+    overscroll-behavior-y: none;
+  }
+  .wrap { max-width: 520px; margin: 0 auto; padding: 0 16px calc(96px + env(safe-area-inset-bottom)); }
+
+  /* Header */
+  header.app {
+    padding: calc(20px + env(safe-area-inset-top)) 16px 12px;
+    max-width: 520px; margin: 0 auto;
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  header.app h1 { font-size: 28px; font-weight: 800; letter-spacing: -0.5px; margin: 0; }
+  header.app p { margin: 2px 0 0; color: var(--sub); font-size: 13px; }
+  .strict { display: flex; align-items: center; gap: 8px; font-size: 13px; color: var(--sub); }
+
+  /* iOS toggle */
+  .toggle { position: relative; width: 51px; height: 31px; flex: none; cursor: pointer; }
+  .toggle input { opacity: 0; width: 0; height: 0; }
+  .toggle .track {
+    position: absolute; inset: 0; border-radius: 16px;
+    background: var(--card2); transition: background .25s;
+  }
+  .toggle .knob {
+    position: absolute; top: 2px; left: 2px; width: 27px; height: 27px; border-radius: 50%;
+    background: #fff; box-shadow: 0 2px 6px rgba(0,0,0,.4);
+    transition: transform .25s cubic-bezier(.32,1.4,.44,1);
+  }
+  .toggle input:checked + .track { background: var(--green); }
+  .toggle input:checked + .track .knob { transform: translateX(20px); }
+
+  /* Cards */
+  .card {
+    background: var(--card); border-radius: var(--radius);
+    padding: 16px; margin: 12px 0;
+    border: 1px solid rgba(255,255,255,.04);
+  }
+  .card h2 { font-size: 19px; font-weight: 700; margin: 0 0 2px; letter-spacing: -.3px; }
+  .card .sub { color: var(--sub); font-size: 14px; margin: 0 0 12px; }
+  .sec-head { display: flex; align-items: baseline; justify-content: space-between; margin-bottom: 10px; }
+  .sec-head .count { font-size: 13px; color: var(--sub); font-variant-numeric: tabular-nums; }
+  .bar { height: 6px; background: var(--card2); border-radius: 3px; overflow: hidden; margin-bottom: 12px; }
+  .bar i { display: block; height: 100%; background: var(--green); border-radius: 3px; transition: width .3s; width: 0; }
+
+  /* Check rows — big tap targets */
+  .check {
+    display: flex; align-items: center; gap: 12px; width: 100%;
+    background: none; border: none; color: var(--text);
+    font-size: 16px; text-align: left; font-family: inherit;
+    padding: 13px 4px; min-height: 52px; cursor: pointer;
+    border-bottom: 1px solid rgba(255,255,255,.05);
+  }
+  .check:last-child { border-bottom: none; }
+  .box {
+    flex: none; width: 28px; height: 28px; border-radius: 50%;
+    border: 2px solid var(--line);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 16px; color: transparent;
+    transition: all .18s cubic-bezier(.32,1.6,.44,1);
+  }
+  .check.done .box { background: var(--green); border-color: var(--green); color: #000; }
+  .check.done { color: var(--sub); }
+  .check.done span.txt { text-decoration: line-through; text-decoration-color: rgba(255,255,255,.25); }
+  .check:active { transform: scale(.985); }
+  .check.blocker .box { border-radius: 8px; }
+  .check.blocker.hit .box { background: var(--red); border-color: var(--red); color: #fff; }
+  .check.blocker.hit { color: var(--red); }
+
+  /* Segmented control */
+  .seg {
+    display: flex; background: var(--card2); border-radius: 12px; padding: 3px; margin: 8px 0 4px;
+  }
+  .seg button {
+    flex: 1; border: none; background: none; color: var(--text);
+    font-size: 16px; font-weight: 600; font-family: inherit;
+    padding: 10px 0; border-radius: 9px; cursor: pointer;
+    transition: background .2s;
+  }
+  .seg button.on { background: #636366; box-shadow: 0 2px 6px rgba(0,0,0,.3); }
+  .seg.buy button.on-buy { background: var(--green); color: #000; }
+  .seg.sell button.on-sell { background: var(--red); color: #fff; }
+
+  /* Inputs */
+  label.f { display: block; font-size: 13px; color: var(--sub); margin: 12px 0 6px; text-transform: uppercase; letter-spacing: .5px; }
+  input[type=text], input[type=number], textarea {
+    width: 100%; background: var(--card2); border: 1px solid transparent;
+    color: var(--text); border-radius: 12px; padding: 13px 14px;
+    font-size: 17px; font-family: inherit; outline: none;
+    -webkit-appearance: none; appearance: none;
+  }
+  input:focus, textarea:focus { border-color: var(--blue); }
+  textarea { min-height: 76px; resize: vertical; }
+  .stepper { display: flex; align-items: stretch; gap: 8px; }
+  .stepper button {
+    flex: none; width: 52px; border: none; border-radius: 12px;
+    background: var(--card2); color: var(--blue); font-size: 24px; font-weight: 600;
+    cursor: pointer;
+  }
+  .stepper button:active { background: #3A3A3C; }
+  .stepper input { text-align: center; font-variant-numeric: tabular-nums; font-size: 19px; font-weight: 600; }
+
+  /* Stat grid */
+  .stats { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 12px; }
+  .stat { background: var(--card2); border-radius: 12px; padding: 12px 14px; }
+  .stat .k { font-size: 12px; color: var(--sub); text-transform: uppercase; letter-spacing: .5px; }
+  .stat .v { font-size: 22px; font-weight: 700; font-variant-numeric: tabular-nums; margin-top: 2px; }
+  .stat .v.bad { color: var(--red); }
+  .stat .v.good { color: var(--green); }
+
+  /* Verdict — sticky above tab bar */
+  .verdict {
+    position: fixed; left: 0; right: 0;
+    bottom: calc(64px + env(safe-area-inset-bottom));
+    max-width: 520px; margin: 0 auto; padding: 0 16px 8px;
+    pointer-events: none; z-index: 40;
+  }
+  .verdict .pill {
+    pointer-events: auto; border-radius: 18px; padding: 14px 16px;
+    display: flex; align-items: center; gap: 12px;
+    box-shadow: 0 8px 30px rgba(0,0,0,.5);
+    transition: background .25s;
+  }
+  .verdict .dot { flex: none; width: 14px; height: 14px; border-radius: 50%; background: var(--sub); }
+  .verdict.wait .pill { background: #2C2C2E; }
+  .verdict.go .pill { background: #0E3B1E; border: 1px solid var(--green); }
+  .verdict.go .dot { background: var(--green); box-shadow: 0 0 12px var(--green); }
+  .verdict.no .pill { background: #3B0E0E; border: 1px solid var(--red); }
+  .verdict.no .dot { background: var(--red); box-shadow: 0 0 12px var(--red); }
+  .verdict .t { font-weight: 800; font-size: 17px; letter-spacing: .3px; }
+  .verdict .s { font-size: 13px; color: var(--sub); }
+  .verdict .reasons { display: none; margin-top: 8px; font-size: 14px; color: var(--text); }
+  .verdict.open .reasons { display: block; }
+  .verdict .reasons li { margin: 4px 0; }
+  .verdict .more { margin-left: auto; color: var(--blue); font-size: 14px; font-weight: 600; background: none; border: none; font-family: inherit; cursor: pointer; pointer-events: auto; }
+
+  /* Buttons */
+  .btn {
+    display: block; width: 100%; border: none; border-radius: 14px;
+    padding: 15px; font-size: 17px; font-weight: 700; font-family: inherit;
+    cursor: pointer; margin-top: 12px;
+    transition: transform .12s;
+  }
+  .btn:active { transform: scale(.98); }
+  .btn.primary { background: var(--blue); color: #fff; }
+  .btn.ghost { background: var(--card2); color: var(--text); }
+  .btn.danger { background: rgba(255,69,58,.15); color: var(--red); }
+
+  /* Bottom tab bar */
+  nav.tabs {
+    position: fixed; left: 0; right: 0; bottom: 0; z-index: 50;
+    background: rgba(20,20,22,.88);
+    -webkit-backdrop-filter: blur(20px); backdrop-filter: blur(20px);
+    border-top: 1px solid rgba(255,255,255,.08);
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+  nav.tabs .row { display: flex; max-width: 520px; margin: 0 auto; }
+  nav.tabs button {
+    flex: 1; background: none; border: none; color: var(--sub);
+    font-family: inherit; font-size: 10px; font-weight: 600;
+    padding: 8px 0 6px; cursor: pointer;
+    display: flex; flex-direction: column; align-items: center; gap: 3px;
+  }
+  nav.tabs button svg { width: 24px; height: 24px; }
+  nav.tabs button.on { color: var(--blue); }
+  .view { display: none; animation: fade .22s ease; }
+  .view.on { display: block; }
+  @keyframes fade { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+  .check.done .box { animation: pop .25s cubic-bezier(.32,1.6,.44,1); }
+  @keyframes pop { 0% { transform: scale(.6); } 100% { transform: scale(1); } }
+
+  /* Journal */
+  .log { background: var(--card2); border-radius: 12px; padding: 12px 14px; margin: 8px 0; font-size: 15px; }
+  .log .r { font-weight: 800; font-size: 17px; }
+  .log .r.pos { color: var(--green); } .log .r.neg { color: var(--red); }
+  .log .m { color: var(--sub); font-size: 13px; margin-top: 4px; }
+  .log .d { font-size: 12px; color: var(--sub); margin-top: 6px; }
+
+  /* Flashcards */
+  .flash { background: var(--card2); border-radius: 12px; padding: 16px; margin: 8px 0; cursor: pointer; min-height: 76px;
+    display: flex; align-items: center; justify-content: center; text-align: center;
+    font-size: 17px; font-weight: 600; transition: transform .15s; }
+  .flash:active { transform: scale(.98); }
+  .flash .a { display: none; color: var(--green); font-weight: 700; }
+  .flash.flip .q { display: none; } .flash.flip .a { display: block; }
+
+  details.drill { background: var(--card2); border-radius: 12px; margin: 8px 0; overflow: hidden; }
+  details.drill summary { padding: 15px 16px; font-weight: 700; font-size: 16px; cursor: pointer; list-style: none; }
+  details.drill summary::-webkit-details-marker { display: none; }
+  details.drill .body { padding: 0 16px 16px; color: var(--sub); font-size: 15px; }
+  details.drill .body div { padding: 6px 0; border-bottom: 1px solid rgba(255,255,255,.05); }
+  details.drill .body div:last-child { border: none; }
+
+  .lock { text-align: center; padding: 30px 16px; color: var(--sub); }
+  .lock .big { font-size: 40px; margin-bottom: 8px; }
+  .foot { text-align: center; color: var(--sub); font-size: 12px; padding: 24px 0 8px; }
+  .rowline { display: flex; gap: 8px; }
+  .rowline > * { flex: 1; }
+</style>
+</head>
+<body>
+<header class="app">
+  <div>
+    <h1>Trading Bouncer</h1>
+    <p>Discipline in. Impulse out.</p>
+  </div>
+  <label class="strict">Strict
+    <span class="toggle"><input type="checkbox" id="strictToggle" checked><span class="track"><span class="knob"></span></span></span>
+  </label>
+</header>
+
+<div class="wrap">
+
+  <!-- SESSION -->
+  <section class="view on" id="v-session">
+    <div class="card">
+      <div class="sec-head"><h2>Session Gate</h2><span class="count" id="c-session">0/8</span></div>
+      <p class="sub">Once per day. Two minutes. No pass, no trading.</p>
+      <div class="bar"><i id="b-session"></i></div>
+      <label class="f">Account size ($)</label>
+      <input type="number" id="f-acct" inputmode="decimal" min="1" value="500">
+      <label class="f">Risk per trade (%)</label>
+      <div class="stepper">
+        <button id="risk-minus">−</button>
+        <input type="number" id="f-risk" inputmode="decimal" readonly>
+        <button id="risk-plus">+</button>
+      </div>
+      <p class="sub" id="risk-dollars" style="margin:8px 0 0"></p>
+      <label class="f">Daily loss tracker</label>
+      <div class="stat" style="margin-bottom:8px"><div class="k">Lost today</div><div class="v" id="s-dayloss">0% / 3%</div></div>
+      <div class="bar"><i id="b-dayloss"></i></div>
+      <div class="rowline">
+        <button class="btn ghost" id="btn-log-loss" style="margin-top:4px">Log −1%</button>
+        <button class="btn ghost" id="btn-undo-loss" style="margin-top:4px">Undo</button>
+      </div>
+      <div id="list-session"></div>
+      <button class="btn ghost" id="btn-reset-day">Reset day</button>
+    </div>
+  </section>
+
+  <!-- TRADE -->
+  <section class="view" id="v-trade">
+    <div id="trade-lock"></div>
+    <div id="trade-body" style="display:none">
+      <div class="card">
+        <div class="sec-head"><h2>Trade Ticket</h2></div>
+        <label class="f">Market</label>
+        <input type="text" id="f-market" list="dl-markets" placeholder="GBP/JPY" autocomplete="off">
+        <datalist id="dl-markets"></datalist>
+        <div id="usdjpy-wrap" style="display:none">
+          <label class="f">USD/JPY price now</label>
+          <input type="number" id="f-usdjpy" inputmode="decimal" placeholder="e.g. 149.50">
+        </div>
+        <label class="f">Side</label>
+        <div class="seg" id="seg-side">
+          <button data-v="Buy">Buy</button>
+          <button data-v="Sell">Sell</button>
+        </div>
+        <label class="f">Entry price</label>
+        <div class="stepper">
+          <button data-t="entry" data-d="-1">−</button>
+          <input type="number" id="f-entry" inputmode="decimal" placeholder="0.00">
+          <button data-t="entry" data-d="1">+</button>
+        </div>
+        <label class="f">Stop loss</label>
+        <div class="stepper">
+          <button data-t="stop" data-d="-1">−</button>
+          <input type="number" id="f-stop" inputmode="decimal" placeholder="0.00">
+          <button data-t="stop" data-d="1">+</button>
+        </div>
+        <label class="f">Target</label>
+        <div class="stepper">
+          <button data-t="target" data-d="-1">−</button>
+          <input type="number" id="f-target" inputmode="decimal" placeholder="0.00">
+          <button data-t="target" data-d="1">+</button>
+        </div>
+        <label class="f">Zone</label>
+        <input type="text" id="f-zone" list="dl-zones" placeholder="Buyer zone below…" autocomplete="off">
+        <datalist id="dl-zones"></datalist>
+        <div class="stats">
+          <div class="stat"><div class="k" id="s-riskk">1% Risk</div><div class="v" id="s-risk">$0.00</div></div>
+          <div class="stat"><div class="k">R : R</div><div class="v" id="s-rr">–</div></div>
+          <div class="stat"><div class="k">Units</div><div class="v" id="s-units">–</div></div>
+          <div class="stat"><div class="k">Risk dist.</div><div class="v" id="s-dist">–</div></div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="sec-head"><h2>Entry Gate</h2><span class="count" id="c-entry">0/10</span></div>
+        <p class="sub">60 seconds. Right before you click.</p>
+        <div class="bar"><i id="b-entry"></i></div>
+        <div id="list-entry"></div>
+      </div>
+
+      <div class="card">
+        <div class="sec-head"><h2 style="color:var(--red)">Blockers</h2><span class="count" id="c-block">0 active</span></div>
+        <p class="sub">If any is true, the trade is dead.</p>
+        <div id="list-block"></div>
+      </div>
+
+      <div style="height:110px"></div>
+    </div>
+    <div class="verdict wait" id="verdict">
+      <div class="pill" id="verdict-pill">
+        <div class="dot"></div>
+        <div><div class="t" id="v-title">NOT YET</div><div class="s" id="v-sub">Fill the ticket and the gates.</div></div>
+        <button class="more" id="v-more">Why</button>
+      </div>
+      <div class="pill" style="margin-top:8px; display:none" id="v-reasons-wrap"><ul class="reasons" id="v-reasons" style="display:block; margin:0; padding-left:18px"></ul></div>
+    </div>
+  </section>
+
+  <!-- JOURNAL -->
+  <section class="view" id="v-journal">
+    <div class="card">
+      <div class="sec-head"><h2>Log a trade</h2></div>
+      <p class="sub">Log the setup even if the best trade was no trade.</p>
+      <label class="f">Result in R</label>
+      <input type="text" id="j-result" placeholder="+2R, -1R, BE, No trade" autocomplete="off">
+      <label class="f">Mistake</label>
+      <input type="text" id="j-mistake" placeholder="FOMO, chase, no mistake…" autocomplete="off">
+      <label class="f">What I did well</label>
+      <textarea id="j-well" placeholder="Followed the gate, sized right…"></textarea>
+      <button class="btn primary" id="btn-save-log">Save entry</button>
+    </div>
+    <div class="card">
+      <div class="sec-head"><h2>Manage</h2><span class="count" id="c-manage">0/8</span></div>
+      <div class="bar"><i id="b-manage"></i></div>
+      <div id="list-manage"></div>
+    </div>
+    <div class="card">
+      <div class="sec-head"><h2>Exit rules</h2><span class="count" id="c-exit">0/8</span></div>
+      <div class="bar"><i id="b-exit"></i></div>
+      <div id="list-exit"></div>
+    </div>
+    <div class="card">
+      <div class="sec-head"><h2>After trade</h2><span class="count" id="c-after">0/6</span></div>
+      <div class="bar"><i id="b-after"></i></div>
+      <div id="list-after"></div>
+    </div>
+    <div class="card">
+      <div class="sec-head"><h2>Recent logs</h2></div>
+      <div id="logs"></div>
+    </div>
+  </section>
+
+  <!-- STUDY -->
+  <section class="view" id="v-study">
+    <div class="card">
+      <div class="sec-head"><h2>Drills</h2></div>
+      <p class="sub">Outside live trading. Don't bring study notes into the live gate.</p>
+      <div id="drills"></div>
+    </div>
+    <div class="card">
+      <div class="sec-head"><h2>Flashcards</h2></div>
+      <p class="sub">Tap a card to flip it.</p>
+      <div id="flash"></div>
+    </div>
+  </section>
+
+  <!-- MASTERY -->
+  <section class="view" id="v-mastery">
+    <div class="card">
+      <div class="sec-head"><h2>System Mastery</h2><span class="count" id="c-mastery">0/60</span></div>
+      <p class="sub">The full 60. Learn it once, audit weekly — not a daily ritual.</p>
+      <div class="bar"><i id="b-mastery"></i></div>
+      <div id="list-mastery"></div>
+    </div>
+  </section>
+
+  <div class="foot">Education and practice tool only.<br>The app approves discipline, not profit.</div>
+</div>
+
+<nav class="tabs"><div class="row">
+  <button data-v="v-session" class="on">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3l7 4v5c0 5-3.5 8-7 9-3.5-1-7-4-7-9V7z"/><path d="M9 12l2 2 4-4"/></svg>
+    Session</button>
+  <button data-v="v-trade">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 2L4 14h6l-1 8 9-12h-6z"/></svg>
+    Trade</button>
+  <button data-v="v-journal">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16v16H4z"/><path d="M8 9h8M8 13h8M8 17h5"/></svg>
+    Journal</button>
+  <button data-v="v-study">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 5a2 2 0 012-2h13v16H6a2 2 0 00-2 2z"/><path d="M4 19a2 2 0 012-2h13"/></svg>
+    Study</button>
+  <button data-v="v-mastery">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="9" r="6"/><path d="M8.5 14L7 22l5-3 5 3-1.5-8"/></svg>
+    Mastery</button>
+</div></nav>
+
+<script>
+/* ============ DATA ============ */
+const SESSION = [
+  "I'm calm — not rushing, angry, bored, greedy, or trying to win money back.",
+  "I know my account size today.",
+  "I checked for major news / high-impact events.",
+  "Daily stop: I quit at 3% total loss. No exceptions.",
+  "Max 3 trades today.",
+  "One market picked for this session.",
+  "I won't trade just because price is moving fast.",
+  "Every trade needs at least 2R of reward."
+];
+const ENTRY = [
+  "Indication happened.",
+  "Correction happened after indication.",
+  "Continuation is starting.",
+  "Price is not inside a no-trade zone.",
+  "Setup is near my marked buyer/seller zone.",
+  "Stop loss is placed at invalidation.",
+  "Risk is 1% or less.",
+  "Target is at least 2R.",
+  "I am calm, not chasing or revenge trading.",
+  "I already know where I will exit if wrong."
+];
+const BLOCKERS = [
+  "Price is stuck between a marked high and low.",
+  "No swing high or low has been broken.",
+  "Price is chopping sideways.",
+  "Price is in the middle of the range.",
+  "The setup only looks good because I'm forcing it.",
+  "I'm trying to make back a loss.",
+  "I'm entering because price is moving fast.",
+  "I'm unsure but still want to click buy/sell."
+];
+const MANAGE = [
+  "I will not stare at every candle like it owes me money.",
+  "I will not add random trades.",
+  "I will not move stop loss farther away.",
+  "I will not close early unless structure gives a valid reason.",
+  "If higher support forms against my sell idea, I exit or reduce risk.",
+  "If higher resistance forms against my buy idea, I exit or reduce risk.",
+  "If target is hit, I take profit according to plan.",
+  "If stop loss is hit, I accept it and log it."
+];
+const EXITR = [
+  "Exit if stop loss is hit.",
+  "Exit if target is hit.",
+  "Exit if soft TP area is reached and price starts reacting.",
+  "Exit if structure invalidates the trade.",
+  "Exit if price starts forming opposite structure.",
+  "Exit if I am emotionally losing discipline.",
+  "Exit if daily loss limit is reached.",
+  "Exit if I already took 3 trades today."
+];
+const AFTER = [
+  "Screenshot the trade or setup.",
+  "Log entry reason, stop, target, and result.",
+  "Write whether indication, correction, and continuation were present.",
+  "Write what I did right and wrong.",
+  "If no clean setup came, write: No clean setup.",
+  "Walk away without forcing a trade."
+];
+const MASTERY = [
+  ["Hard Rules", "If your head is cooked, the trade is denied.", [
+    "I am calm, not rushing, angry, bored, greedy, or trying to make money back.",
+    "I know my account size today.",
+    "I will risk no more than my planned risk % on one trade.",
+    "I will stop trading after 3% total loss in one day.",
+    "I will take max 3 trades today.",
+    "The trade must have at least 2R reward compared to risk.",
+    "I checked for major news or high-impact events before trading.",
+    "I will not trade just because price is moving fast.",
+    "I will not trade inside a no-trade zone.",
+    "I will not trade the indication by itself.",
+    "I will only enter after indication, correction, and continuation line up."
+  ]],
+  ["Setup Foundation", "No clean structure means no setup.", [
+    "TradingView is open and the chart is clean.",
+    "I picked one main market for this session.",
+    "The market has real movement and liquidity.",
+    "I started from the higher timeframe, not 5M or 15M.",
+    "1H is checked for day-trading structure.",
+    "4H is checked for higher-timeframe structure.",
+    "1D is checked if major context is needed.",
+    "15M is checked for correction and entry precision.",
+    "5M is used only if the 15M setup is already clean.",
+    "15M, 1H, and 4H are aligned enough before entry."
+  ]],
+  ["Markup Gate", "Clean levels only. Spaghetti chart gets bounced.", [
+    "I found current price first.",
+    "I found the closest important high near current price.",
+    "I found the closest important low near current price.",
+    "I marked previous swing highs.",
+    "I marked previous swing lows.",
+    "I marked seller zones above price.",
+    "I marked buyer zones below price.",
+    "I used only the cleanest levels, not every tiny candle.",
+    "I used sessions only if they matter today.",
+    "I used wick points as a guide, not as the whole reason.",
+    "I did not build the trade idea from 15M or 5M."
+  ]],
+  ["ICC Gate", "Indication → Correction → Continuation. No shortcut.", [
+    "Indication happened first: price broke a swing high or swing low.",
+    "Correction happened after indication.",
+    "Continuation is beginning after correction.",
+    "The setup is near a marked buyer or seller zone.",
+    "The setup is not random space in the middle.",
+    "I am not chasing the breakout candle.",
+    "I am reacting to structure, not predicting."
+  ]],
+  ["Entry Gate", "Every box must pass before the app says GO.", [
+    "Higher-timeframe direction is clear.",
+    "Market condition is identified: uptrend, downtrend, or consolidation.",
+    "Key levels are marked.",
+    "Price is not in a no-trade zone.",
+    "Entry is on 15M or 5M only after the setup is clean.",
+    "Entry is not based on FOMO, greed, revenge, or boredom.",
+    "Stop loss is placed before entry.",
+    "Target is placed before entry.",
+    "Risk is calculated before entry.",
+    "Reward is at least 2R.",
+    "This trade matches my selected direction: Buy or Sell."
+  ]],
+  ["Stop Loss + Target Gate", "Stop where the idea is wrong. Target where the chart pays.", [
+    "Stop loss is not random.",
+    "For a buy, stop is below recent swing low or buyer-zone invalidation.",
+    "For a sell, stop is above recent swing high or seller-zone invalidation.",
+    "If price hits stop loss, my trade idea is invalidated.",
+    "Position size keeps risk at 1%.",
+    "I will not move stop loss farther away after entry.",
+    "Target is based on a real level, zone, or structure point.",
+    "First target is at 2R or better.",
+    "Soft TP is allowed near target if price reacts hard.",
+    "If price reaches target area, I will not get greedy."
+  ]]
+];
+const DRILLS = [
+  ["Structure Drill", ["Open replay.", "Mark HH, HL, LH, LL.", "Label uptrend, downtrend, or consolidation.", "Do not look for entries yet."]],
+  ["Markup Drill", ["Start on 1H.", "Mark current price, closest high, closest low.", "Mark buyer and seller zones.", "Use only clean levels."]],
+  ["ICC Drill", ["Find indication.", "Wait for correction.", "Identify continuation.", "Write whether you would buy, sell, or wait."]],
+  ["No-Trade Drill", ["Find ranges with high and low but no indication.", "Box them.", "Practice doing nothing. Boring but elite."]],
+  ["Review Drill", ["Screenshot 10 old setups.", "Write if each entry followed the checklist.", "Find your repeated mistake."]]
+];
+const FLASH = [
+  ["What is indication?", "A break above a swing high or below a swing low."],
+  ["Do you trade indication alone?", "No. Use it as information only."],
+  ["What comes after indication?", "Correction."],
+  ["What comes after correction?", "Continuation."],
+  ["Markup timeframe?", "1H and higher."],
+  ["Entry timeframe?", "15M or 5M."],
+  ["Max risk per trade?", "1%."],
+  ["Daily loss stop?", "3%."],
+  ["Max trades per day?", "3 trades."]
+];
+
+/* ============ STATE ============ */
+const KEY = "trading-bouncer-v2";
+let S = load() || {
+  strict: true, acct: 500, riskPct: 1, lossLog: [], stopDate: null,
+  session: [], entry: [], block: [],
+  manage: [], exit: [], after: [],
+  mastery: {},
+  ticket: { market: "", side: "", entry: "", stop: "", target: "", zone: "", usdjpy: "" },
+  markets: [], zones: [], logs: []
+};
+if (typeof S.riskPct !== "number") S.riskPct = 1;
+if (!Array.isArray(S.lossLog)) S.lossLog = [];
+function load() { try { return JSON.parse(localStorage.getItem(KEY)); } catch (e) { return null; } }
+function save() { try { localStorage.setItem(KEY, JSON.stringify(S)); } catch (e) {} }
+const $ = id => document.getElementById(id);
+
+/* ============ RENDER ============ */
+function checkRow(text, done, blocker) {
+  const b = document.createElement("button");
+  b.className = "check" + (done ? " done" : "") + (blocker ? " blocker" + (done ? " hit" : "") : "");
+  b.innerHTML = '<span class="box">✓</span><span class="txt"></span>';
+  b.querySelector(".txt").textContent = text;
+  return b;
+}
+function renderList(elId, arr, key, blocker) {
+  const el = $(elId); el.innerHTML = "";
+  arr.forEach((t, i) => {
+    const done = (S[key] || []).includes(i);
+    const row = checkRow(t, done, blocker);
+    row.onclick = () => {
+      const a = S[key] || (S[key] = []);
+      const ix = a.indexOf(i);
+      if (ix >= 0) a.splice(ix, 1); else a.push(i);
+      save(); renderAll();
+    };
+    el.appendChild(row);
+  });
+}
+function setCount(cId, bId, done, total, suffix) {
+  $(cId).textContent = done + "/" + total + (suffix || "");
+  $(bId).style.width = (total ? (done / total * 100) : 0) + "%";
+}
+function renderMastery() {
+  const el = $("list-mastery"); el.innerHTML = "";
+  let done = 0, total = 0;
+  MASTERY.forEach((sec, si) => {
+    total += sec[2].length;
+    const h = document.createElement("div");
+    h.innerHTML = '<div class="sec-head" style="margin-top:14px"><h2 style="font-size:16px"></h2><span class="count"></span></div><p class="sub"></p>';
+    h.querySelector("h2").textContent = (si + 1) + ". " + sec[0];
+    h.querySelector(".sub").textContent = sec[1];
+    el.appendChild(h);
+    const key = "m" + si, arr = S.mastery[key] || [];
+    let sd = 0;
+    sec[2].forEach((t, i) => {
+      const d = arr.includes(i); if (d) { sd++; done++; }
+      const row = checkRow(t, d, false);
+      row.onclick = () => {
+        const a = S.mastery[key] || (S.mastery[key] = []);
+        const ix = a.indexOf(i);
+        if (ix >= 0) a.splice(ix, 1); else a.push(i);
+        save(); renderAll();
+      };
+      el.appendChild(row);
+    });
+    h.querySelector(".count").textContent = sd + "/" + sec[2].length;
+  });
+  setCount("c-mastery", "b-mastery", done, total);
+}
+
+/* ============ RISK MATH ============ */
+function marketQuote() {
+  const m = (S.ticket.market || "").toUpperCase().replace(/\s/g, "");
+  let q = (m.split("/")[1] || "").trim();
+  if (!q && m.length === 6) q = m.slice(3);
+  return q;
+}
+function quoteToUSD() {
+  const q = marketQuote();
+  if (!q || q === "USD") return 1;
+  if (q === "JPY") {
+    const r = parseFloat(S.ticket.usdjpy);
+    return (isFinite(r) && r > 0) ? 1 / r : null;
+  }
+  return null;
+}
+function nums() {
+  const t = S.ticket;
+  const e = parseFloat(t.entry), s = parseFloat(t.stop), g = parseFloat(t.target);
+  const acct = parseFloat(S.acct) || 0;
+  const risk$ = acct * (S.riskPct / 100);
+  if (!isFinite(e) || !isFinite(s) || e === s) return { risk$, rr: null, dist: null, units: null, ok: false };
+  const dist = Math.abs(e - s);
+  const qf = quoteToUSD();
+  const units = (dist > 0 && qf) ? risk$ / (dist * qf) : null;
+  let rr = null;
+  if (isFinite(g)) rr = Math.abs(g - e) / dist;
+  return { risk$, rr, dist, units, ok: true };
+}
+function renderTicket() {
+  const t = S.ticket;
+  $("f-risk").value = S.riskPct;
+  $("s-riskk").textContent = S.riskPct + "% Risk";
+  $("usdjpy-wrap").style.display = marketQuote() === "JPY" ? "block" : "none";
+  $("f-usdjpy").value = S.ticket.usdjpy || "";
+  $("f-market").value = t.market; $("f-zone").value = t.zone;
+  $("f-entry").value = t.entry; $("f-stop").value = t.stop; $("f-target").value = t.target;
+  document.querySelectorAll("#seg-side button").forEach(b => {
+    b.classList.toggle("on", b.dataset.v === t.side);
+    b.classList.toggle("on-buy", b.dataset.v === "Buy" && t.side === "Buy");
+    b.classList.toggle("on-sell", b.dataset.v === "Sell" && t.side === "Sell");
+  });
+  const seg = $("seg-side");
+  seg.classList.toggle("buy", t.side === "Buy");
+  seg.classList.toggle("sell", t.side === "Sell");
+  const n = nums();
+  $("s-risk").textContent = "$" + n.risk$.toFixed(2);
+  $("risk-dollars").textContent = "= $" + n.risk$.toFixed(2) + " per trade";
+  const rrEl = $("s-rr");
+  if (n.rr === null) { rrEl.textContent = "–"; rrEl.className = "v"; }
+  else {
+    rrEl.textContent = n.rr.toFixed(2) + "R";
+    rrEl.className = "v " + (n.rr >= 2 ? "good" : "bad");
+  }
+  const mktU = (t.market || "").toUpperCase();
+  const isGold = /XAU|GOLD/.test(mktU);
+  const isFxPair = mktU.includes("/") || mktU.replace(/\s/g, "").length === 6;
+  let unitsTxt = "–";
+  if (n.units !== null) {
+    if (isGold) unitsTxt = (n.units / 100).toFixed(2) + " lots";
+    else if (isFxPair) unitsTxt = (n.units / 100000).toFixed(2) + " lots";
+    else unitsTxt = n.units >= 1000 ? (n.units / 1000).toFixed(2) + "k" : n.units.toFixed(1);
+  }
+  $("s-units").textContent = unitsTxt;
+  $("s-dist").textContent = n.dist !== null ? n.dist.toString() : "–";
+  const dm = $("dl-markets"); dm.innerHTML = "";
+  S.markets.forEach(m => { const o = document.createElement("option"); o.value = m; dm.appendChild(o); });
+  const dz = $("dl-zones"); dz.innerHTML = "";
+  S.zones.forEach(z => { const o = document.createElement("option"); o.value = z; dz.appendChild(o); });
+}
+
+/* ============ VERDICT ============ */
+function verdict() {
+  const reasons = [];
+  const t = S.ticket, n = nums();
+  const sessionDone = S.session.length >= SESSION.length;
+  if (S.strict && !sessionDone) reasons.push("Session gate not complete (" + S.session.length + "/" + SESSION.length + ").");
+  if (!t.market.trim()) reasons.push("Choose one market.");
+  if (!t.side) reasons.push("Choose Buy or Sell.");
+  if (!n.ok) reasons.push("Entry and stop loss must be filled (and different).");
+  if (n.ok && (n.rr === null)) reasons.push("Target must be filled.");
+  if (n.rr !== null && n.rr < 2) reasons.push("Reward-to-risk is " + n.rr.toFixed(2) + "R — needs at least 2R.");
+  const missing = ENTRY.length - S.entry.length;
+  if (missing > 0) reasons.push(missing + " entry check" + (missing > 1 ? "s" : "") + " unchecked.");
+  if (S.block.length > 0) reasons.push(S.block.length + " blocker" + (S.block.length > 1 ? "s" : "") + " active — trade is dead.");
+  const v = $("verdict");
+  const title = $("v-title"), sub = $("v-sub");
+  v.className = "verdict " + (reasons.length ? "no" : (t.market || t.side || S.entry.length ? "go" : "wait"));
+  if (!reasons.length && (t.market || t.side || S.entry.length)) {
+    title.textContent = "GO"; sub.textContent = "Bouncer approves. Execute your plan.";
+  } else if (!reasons.length) {
+    title.textContent = "NOT YET"; sub.textContent = "Fill the ticket and the gates.";
+  } else {
+    title.textContent = "NO-GO"; sub.textContent = reasons.length + " thing" + (reasons.length > 1 ? "s" : "") + " to fix.";
+  }
+  const ul = $("v-reasons"); ul.innerHTML = "";
+  reasons.forEach(r => { const li = document.createElement("li"); li.textContent = r; ul.appendChild(li); });
+  $("v-reasons-wrap").style.display = "none";
+  $("v-more").textContent = "Why";
+  v.classList.remove("open");
+  return reasons;
+}
+
+/* ============ TRADE LOCK ============ */
+function todayStr() { return new Date().toLocaleDateString("en-CA"); }
+function dayLoss() { return (S.lossLog || []).reduce((a, b) => a + b, 0); }
+function stopLocked() { return S.stopDate === todayStr(); }
+function renderLock() {
+  const done = S.session.length >= SESSION.length;
+  const stop = stopLocked();
+  const show = stop || (S.strict && !done);
+  let html = "";
+  if (stop) {
+    html = '<div class="card"><div class="lock"><div class="big">🛑</div><h2 style="margin:0 0 6px">Daily stop hit</h2><p class="sub" style="margin:0">Logged ' + dayLoss().toFixed(1).replace(/\.0$/, "") + '% lost today.<br>Trading unlocks tomorrow.</p><button class="btn ghost" id="btn-unlock-mis" style="max-width:280px;margin-left:auto;margin-right:auto">Undo last entry</button></div></div>';
+  } else if (S.strict && !done) {
+    html = '<div class="card"><div class="lock"><div class="big">—</div><h2 style="margin:0 0 6px">Session gate locked</h2><p class="sub" style="margin:0">Finish the Session tab first.<br>Strict mode is on.</p></div></div>';
+  }
+  $("trade-lock").innerHTML = html;
+  const ub = $("btn-unlock-mis");
+  if (ub) ub.onclick = () => {
+    if (!confirm("Remove the last logged loss? Only use this if it was a mis-tap.")) return;
+    S.lossLog.pop();
+    if (dayLoss() < 3) S.stopDate = null;
+    save(); renderAll();
+  };
+  $("trade-body").style.display = show ? "none" : "block";
+  $("verdict").style.display = show ? "none" : "block";
+}
+
+/* ============ JOURNAL ============ */
+function renderLogs() {
+  const el = $("logs"); el.innerHTML = "";
+  if (!S.logs.length) { el.innerHTML = '<p class="sub" style="margin:0">No journal entries yet.</p>'; return; }
+  [...S.logs].reverse().slice(0, 20).forEach(l => {
+    const d = document.createElement("div"); d.className = "log";
+    const pos = /^\+/.test((l.r || "").trim());
+    const neg = /^-/.test((l.r || "").trim());
+    d.innerHTML = '<div class="r ' + (pos ? "pos" : neg ? "neg" : "") + '"></div><div class="m"></div><div class="d"></div>';
+    d.querySelector(".r").textContent = l.r || "—";
+    d.querySelector(".m").textContent = (l.m ? "Mistake: " + l.m + "  •  " : "") + (l.w ? "Did well: " + l.w : "");
+    d.querySelector(".d").textContent = l.d || "";
+    el.appendChild(d);
+  });
+}
+
+/* ============ STUDY ============ */
+function renderStudy() {
+  const dr = $("drills"); dr.innerHTML = "";
+  DRILLS.forEach(d => {
+    const det = document.createElement("details"); det.className = "drill";
+    const sm = document.createElement("summary"); sm.textContent = d[0]; det.appendChild(sm);
+    const b = document.createElement("div"); b.className = "body";
+    d[1].forEach(s => { const x = document.createElement("div"); x.textContent = s; b.appendChild(x); });
+    det.appendChild(b); dr.appendChild(det);
+  });
+  const fl = $("flash"); fl.innerHTML = "";
+  FLASH.forEach(f => {
+    const c = document.createElement("div"); c.className = "flash";
+    c.innerHTML = '<span class="q"></span><span class="a"></span>';
+    c.querySelector(".q").textContent = f[0];
+    c.querySelector(".a").textContent = f[1];
+    c.onclick = () => c.classList.toggle("flip");
+    fl.appendChild(c);
+  });
+}
+
+/* ============ ALL ============ */
+function renderAll() {
+  if (S.stopDate && S.stopDate !== todayStr()) { S.stopDate = null; S.lossLog = []; save(); }
+  ENTRY[6] = "Risk is " + S.riskPct + "% or less.";
+  renderList("list-session", SESSION, "session", false);
+  setCount("c-session", "b-session", S.session.length, SESSION.length);
+  const dl = dayLoss();
+  $("s-dayloss").textContent = dl.toFixed(1).replace(/\.0$/, "") + "% / 3%";
+  $("b-dayloss").style.width = Math.min(100, dl / 3 * 100) + "%";
+  $("b-dayloss").style.background = dl >= 2 ? "var(--red)" : "var(--green)";
+  $("btn-log-loss").textContent = "Log −" + S.riskPct + "%";
+  renderList("list-entry", ENTRY, "entry", false);
+  setCount("c-entry", "b-entry", S.entry.length, ENTRY.length);
+  renderList("list-block", BLOCKERS, "block", true);
+  $("c-block").textContent = S.block.length + " active";
+  renderList("list-manage", MANAGE, "manage", false);
+  setCount("c-manage", "b-manage", S.manage.length, MANAGE.length);
+  renderList("list-exit", EXITR, "exit", false);
+  setCount("c-exit", "b-exit", S.exit.length, EXITR.length);
+  renderList("list-after", AFTER, "after", false);
+  setCount("c-after", "b-after", S.after.length, AFTER.length);
+  renderMastery();
+  renderTicket();
+  renderLock();
+  renderLogs();
+  verdict();
+}
+
+/* ============ EVENTS ============ */
+document.querySelectorAll("nav.tabs button").forEach(b => {
+  b.onclick = () => {
+    document.querySelectorAll("nav.tabs button").forEach(x => x.classList.remove("on"));
+    document.querySelectorAll(".view").forEach(x => x.classList.remove("on"));
+    b.classList.add("on");
+    $(b.dataset.v).classList.add("on");
+    window.scrollTo(0, 0);
+  };
+});
+$("strictToggle").checked = S.strict;
+$("strictToggle").onchange = e => { S.strict = e.target.checked; save(); renderAll(); };
+$("f-acct").value = S.acct;
+$("f-acct").oninput = e => { S.acct = parseFloat(e.target.value) || 0; save(); renderTicket(); verdict(); };
+function setRisk(v) {
+  S.riskPct = Math.min(5, Math.max(0.5, Math.round(v * 2) / 2));
+  save(); renderAll();
+}
+$("risk-minus").onclick = () => setRisk(S.riskPct - 0.5);
+$("risk-plus").onclick = () => setRisk(S.riskPct + 0.5);
+$("btn-log-loss").onclick = () => {
+  S.lossLog.push(S.riskPct);
+  if (dayLoss() >= 3) S.stopDate = todayStr();
+  save(); renderAll();
+};
+$("btn-undo-loss").onclick = () => {
+  S.lossLog.pop();
+  if (dayLoss() < 3) S.stopDate = null;
+  save(); renderAll();
+};
+$("btn-reset-day").onclick = () => {
+  if (!confirm("Reset today's session, entry gates and blockers? Journal stays.")) return;
+  S.session = []; S.entry = []; S.block = []; S.manage = []; S.exit = []; S.after = [];
+  S.ticket = { market: "", side: "", entry: "", stop: "", target: "", zone: "", usdjpy: "" };
+  save(); renderAll();
+};
+document.querySelectorAll("#seg-side button").forEach(b => {
+  b.onclick = () => { S.ticket.side = (S.ticket.side === b.dataset.v) ? "" : b.dataset.v; save(); renderTicket(); verdict(); };
+});
+[["f-market", "market", "markets"], ["f-zone", "zone", "zones"],
+ ["f-entry", "entry"], ["f-stop", "stop"], ["f-target", "target"],
+ ["f-usdjpy", "usdjpy"]].forEach(([id, key, hist]) => {
+  $(id).addEventListener("input", e => {
+    S.ticket[key] = e.target.value;
+    if (hist && e.target.value.trim()) {
+      const v = e.target.value.trim();
+      S[hist] = [v, ...S[hist].filter(x => x !== v)].slice(0, 12);
+    }
+    save(); renderTicket(); verdict();
+  });
+});
+document.querySelectorAll(".stepper button[data-t]").forEach(b => {
+  b.onclick = () => {
+    const map = { entry: "f-entry", stop: "f-stop", target: "f-target" };
+    const inp = $(map[b.dataset.t]);
+    const cur = parseFloat(inp.value) || 0;
+    const entry = parseFloat($("f-entry").value) || 0;
+    const mk = (S.ticket.market || "").toUpperCase();
+    let step;
+    if (mk.includes("JPY")) step = 0.01;
+    else if (mk.includes("XAU") || mk.includes("GOLD")) step = 0.5;
+    else if (mk.includes("/")) step = 0.0001;
+    else step = entry > 100 ? 0.5 : entry > 1 ? 0.01 : 0.0001;
+    if (cur === 0) step = entry > 0 ? step : 0.01;
+    const nv = Math.max(0, cur + parseInt(b.dataset.d) * step);
+    inp.value = nv.toFixed(4).replace(/0+$/, "").replace(/\.$/, "") || "0";
+    inp.dispatchEvent(new Event("input"));
+  };
+});
+$("v-more").onclick = () => {
+  const v = $("verdict");
+  const wrap = $("v-reasons-wrap");
+  const open = wrap.style.display !== "none";
+  wrap.style.display = open ? "none" : "block";
+  $("v-more").textContent = open ? "Why" : "Hide";
+};
+$("verdict-pill").onclick = e => { if (e.target.id !== "v-more") $("v-more").click(); };
+$("btn-save-log").onclick = () => {
+  const r = $("j-result").value.trim();
+  if (!r) { alert("Add a result first (e.g. +2R, -1R, BE, No trade)."); return; }
+  S.logs.push({ r, m: $("j-mistake").value.trim(), w: $("j-well").value.trim(),
+    d: new Date().toLocaleString() });
+  $("j-result").value = ""; $("j-mistake").value = ""; $("j-well").value = "";
+  save(); renderLogs();
+};
+
+/* ============ INIT ============ */
+renderStudy();
+renderAll();
+</script>
+</body>
+</html>
