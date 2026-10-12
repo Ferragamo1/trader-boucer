@@ -268,6 +268,33 @@
       <div id="list-session"></div>
       <button class="btn ghost" id="btn-reset-day">Reset day</button>
     </div>
+
+    <div class="card">
+      <div class="sec-head"><h2>Trading Mode</h2></div>
+      <div class="seg" id="seg-mode">
+        <button data-v="day">Day</button>
+        <button data-v="swing">Swing</button>
+      </div>
+      <p class="sub" id="mode-hint" style="margin:10px 0 0"></p>
+    </div>
+
+    <div class="card" id="card-positions" style="display:none">
+      <div class="sec-head"><h2>Open Positions</h2><span class="count" id="c-positions">0</span></div>
+      <p class="sub">Swing positions carry across days until structure breaks. Reset day never touches these. Daily job: check each one, trail the stop behind the newest swing — stops only move toward profit.</p>
+      <div id="positions"></div>
+      <label class="f">Market</label>
+      <input type="text" id="p-market" list="dl-markets" placeholder="GBP/JPY" autocomplete="off">
+      <label class="f">Side</label>
+      <div class="seg" id="seg-pos-side">
+        <button data-v="Buy">Buy</button>
+        <button data-v="Sell">Sell</button>
+      </div>
+      <label class="f">Entry price</label>
+      <input type="number" id="p-entry" inputmode="decimal" placeholder="0.00">
+      <label class="f">Stop now</label>
+      <input type="number" id="p-stop" inputmode="decimal" placeholder="0.00">
+      <button class="btn primary" id="btn-add-pos">Add position</button>
+    </div>
   </section>
 
   <!-- TRADE -->
@@ -373,6 +400,11 @@
     <div class="card">
       <div class="sec-head"><h2>Recent logs</h2></div>
       <div id="logs"></div>
+      <div class="rowline">
+        <button class="btn ghost" id="btn-export" style="margin-top:4px">Download backup</button>
+        <button class="btn ghost" id="btn-copy-backup" style="margin-top:4px">Copy backup</button>
+      </div>
+      <p class="sub" style="margin:8px 0 0">Backup = everything in the app: journal, checks, positions, settings. It lives only on this phone — save the file somewhere safe (Files, iCloud, email it to yourself).</p>
     </div>
   </section>
 
@@ -580,12 +612,15 @@ const FLASH = [
 const KEY = "trading-bouncer-v2";
 let S = load() || {
   strict: true, acct: 500, riskPct: 1, lossLog: [], stopDate: null,
+  mode: "day", positions: [],
   session: [], entry: [], block: [],
   manage: [], exit: [], after: [],
   mastery: {},
   ticket: { market: "", side: "", entry: "", stop: "", target: "", zone: "", usdjpy: "" },
   markets: [], zones: [], logs: []
 };
+if (!S.mode) S.mode = "day";
+if (!Array.isArray(S.positions)) S.positions = [];
 if (typeof S.riskPct !== "number") S.riskPct = 1;
 if (!Array.isArray(S.lossLog)) S.lossLog = [];
 function load() { try { return JSON.parse(localStorage.getItem(KEY)); } catch (e) { return null; } }
@@ -791,6 +826,66 @@ function renderLogs() {
   });
 }
 
+/* ============ MODE + POSITIONS (swing) ============ */
+function renderMode() {
+  document.querySelectorAll("#seg-mode button").forEach(b =>
+    b.classList.toggle("on", S.mode === b.dataset.v));
+  $("mode-hint").textContent = S.mode === "swing"
+    ? "Swing: positions carry for days/weeks. Daily job = check open positions, trail stops behind the newest swing, exit only when structure breaks. Entries still go through the Trade tab gate on entry days."
+    : "Day: every trade opens and closes today. Session gate, entry gate and the 3% daily stop run the day.";
+  $("card-positions").style.display = S.mode === "swing" ? "block" : "none";
+  renderPositions();
+}
+function posDays(p) {
+  return Math.max(0, Math.floor((Date.now() - new Date(p.opened + "T12:00:00").getTime()) / 86400000));
+}
+function renderPositions() {
+  const el = $("positions");
+  if (!el) return;
+  el.innerHTML = "";
+  $("c-positions").textContent = S.positions.length;
+  if (!S.positions.length) {
+    el.innerHTML = '<p class="sub" style="margin:0 0 4px">No open positions.</p>';
+    return;
+  }
+  S.positions.forEach((p, idx) => {
+    const d = document.createElement("div");
+    d.className = "log";
+    d.innerHTML = '<div class="r"></div><div class="m"></div><div class="d"></div>';
+    d.querySelector(".r").textContent = p.market || "—";
+    d.querySelector(".m").textContent = p.side + " @ " + p.entry + "  •  stop " + p.stop;
+    d.querySelector(".d").textContent = "Opened " + p.opened + "  •  held " + posDays(p) + "d";
+    const row = document.createElement("div");
+    row.className = "rowline";
+    const tb = document.createElement("button");
+    tb.className = "btn ghost"; tb.textContent = "Trail stop";
+    tb.onclick = () => {
+      const ns = prompt("New stop for " + p.market + " (current: " + p.stop + "):", p.stop);
+      if (ns === null || ns.trim() === "") return;
+      const nv = parseFloat(ns), ov = parseFloat(p.stop);
+      if (!isNaN(nv) && !isNaN(ov) && ((p.side === "Buy" && nv < ov) || (p.side === "Sell" && nv > ov))) {
+        if (!confirm("That's loosening the stop. The rules say stops only move toward profit. Move it anyway?")) return;
+      }
+      p.stop = ns.trim();
+      save(); renderPositions();
+    };
+    const cb = document.createElement("button");
+    cb.className = "btn ghost"; cb.textContent = "Close position";
+    cb.onclick = () => {
+      const r = prompt("Result in R for " + p.market + " " + p.side + " (e.g. +4.5R, -1R, BE):", "");
+      if (r === null) return;
+      S.logs.push({ r: r.trim() || "Closed", m: "",
+        w: "Swing held " + posDays(p) + "d (" + p.market + " " + p.side + ")",
+        d: new Date().toLocaleString() });
+      S.positions.splice(idx, 1);
+      save(); renderPositions(); renderLogs();
+    };
+    row.appendChild(tb); row.appendChild(cb);
+    d.appendChild(row);
+    el.appendChild(d);
+  });
+}
+
 /* ============ STUDY ============ */
 function renderStudy() {
   const dr = $("drills"); dr.innerHTML = "";
@@ -837,6 +932,7 @@ function renderAll() {
   renderTicket();
   renderLock();
   renderLogs();
+  renderMode();
   verdict();
 }
 
@@ -924,6 +1020,43 @@ $("btn-save-log").onclick = () => {
     d: new Date().toLocaleString() });
   $("j-result").value = ""; $("j-mistake").value = ""; $("j-well").value = "";
   save(); renderLogs();
+};
+document.querySelectorAll("#seg-mode button").forEach(b => {
+  b.onclick = () => { S.mode = b.dataset.v; save(); renderMode(); };
+});
+let posSide = "";
+document.querySelectorAll("#seg-pos-side button").forEach(b => {
+  b.onclick = () => {
+    posSide = (posSide === b.dataset.v) ? "" : b.dataset.v;
+    document.querySelectorAll("#seg-pos-side button").forEach(x =>
+      x.classList.toggle("on", posSide === x.dataset.v));
+  };
+});
+$("btn-add-pos").onclick = () => {
+  const m = $("p-market").value.trim(), e = $("p-entry").value.trim(), st = $("p-stop").value.trim();
+  if (!m || !posSide || !e || !st) { alert("Fill market, side, entry and stop first."); return; }
+  S.positions.push({ market: m, side: posSide, entry: e, stop: st, opened: todayStr() });
+  S.markets = [m, ...S.markets.filter(x => x !== m)].slice(0, 12);
+  $("p-market").value = ""; $("p-entry").value = ""; $("p-stop").value = "";
+  posSide = "";
+  document.querySelectorAll("#seg-pos-side button").forEach(x => x.classList.remove("on"));
+  save(); renderPositions(); renderTicket();
+};
+$("btn-export").onclick = () => {
+  const blob = new Blob([JSON.stringify(S, null, 2)], { type: "application/json" });
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = "trader-bouncer-backup-" + todayStr() + ".json";
+  document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(() => URL.revokeObjectURL(a.href), 4000);
+};
+$("btn-copy-backup").onclick = async () => {
+  try {
+    await navigator.clipboard.writeText(JSON.stringify(S, null, 2));
+    alert("Backup copied. Paste it somewhere safe (Notes, email, Files).");
+  } catch (e) {
+    alert("Copy didn't work in this browser — use Download backup instead.");
+  }
 };
 
 /* ============ INIT ============ */
