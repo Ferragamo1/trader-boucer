@@ -534,12 +534,11 @@ const MASTERY = [
     "I picked one main market for this session.",
     "The market has real movement and liquidity.",
     "I started from the higher timeframe, not 5M or 15M.",
-    "1H is checked for day-trading structure.",
-    "4H is checked for higher-timeframe structure.",
-    "1D is checked if major context is needed.",
+    "Daily is checked first — the staircase decides if swing trades are allowed.",
+    "1H is where zones are marked — swing highs, swing lows, buyer and seller zones.",
+    "4H is checked for higher-timeframe context.",
     "15M is checked for correction and entry precision.",
-    "5M is used only if the 15M setup is already clean.",
-    "15M, 1H, and 4H are aligned enough before entry."
+    "Daily, 4H, 1H and 15M are aligned enough before entry."
   ]],
   ["Markup Gate", "Clean levels only. Spaghetti chart gets bounced.", [
     "I found current price first.",
@@ -568,7 +567,7 @@ const MASTERY = [
     "Market condition is identified: uptrend, downtrend, or consolidation.",
     "Key levels are marked.",
     "Price is not in a no-trade zone.",
-    "Entry is on 15M or 5M only after the setup is clean.",
+    "Entry is on 15M only after the setup is clean.",
     "Entry is not based on FOMO, greed, revenge, or boredom.",
     "Stop loss is placed before entry.",
     "Target is placed before entry.",
@@ -591,7 +590,7 @@ const MASTERY = [
 ];
 const DRILLS = [
   ["Structure Drill", ["Open replay.", "Mark HH, HL, LH, LL.", "Label uptrend, downtrend, or consolidation.", "Do not look for entries yet."]],
-  ["Markup Drill", ["Start on 1H.", "Mark current price, closest high, closest low.", "Mark buyer and seller zones.", "Use only clean levels."]],
+  ["Markup Drill", ["Start on the daily — mark the staircase: uptrend, downtrend, or flat.", "Then 1H: mark current price, closest high, closest low.", "Mark buyer and seller zones.", "Use only clean levels."]],
   ["ICC Drill", ["Find indication.", "Wait for correction.", "Identify continuation.", "Write whether you would buy, sell, or wait."]],
   ["No-Trade Drill", ["Find ranges with high and low but no indication.", "Box them.", "Practice doing nothing. Boring but elite."]],
   ["Review Drill", ["Screenshot 10 old setups.", "Write if each entry followed the checklist.", "Find your repeated mistake."]]
@@ -601,8 +600,8 @@ const FLASH = [
   ["Do you trade indication alone?", "No. Use it as information only."],
   ["What comes after indication?", "Correction."],
   ["What comes after correction?", "Continuation."],
-  ["Markup timeframe?", "1H and higher."],
-  ["Entry timeframe?", "15M or 5M."],
+  ["Markup timeframe?", "Daily first for the trend, then 1H for zones."],
+  ["Entry timeframe?", "15M only."],
   ["Max risk per trade?", "1%."],
   ["Daily loss stop?", "3%."],
   ["Max trades per day?", "3 trades."]
